@@ -10,6 +10,7 @@ export const APP_IDS = {
     PRODUCTION: 65555,
     PRODUCTION_BE: 65556,
     PRODUCTION_ME: 65557,
+    SMART_TRADES: '32T9SiO0H1nGE4NJJK728', 
 };
 
 export const livechat_license_id = 12049137;
@@ -23,6 +24,8 @@ export const domain_app_ids = {
     'dbot.deriv.com': APP_IDS.PRODUCTION,
     'dbot.deriv.be': APP_IDS.PRODUCTION_BE,
     'dbot.deriv.me': APP_IDS.PRODUCTION_ME,
+    'smarttrades.pro': APP_IDS.SMART_TRADES,
+    'www.smarttrades.pro': APP_IDS.SMART_TRADES,
 };
 
 export const getCurrentProductionDomain = () =>
