@@ -1,0 +1,532 @@
+.accumulators-terminal {
+    padding: 24px;
+    background: var(--brand-blended-white, #f4f7f9);
+    min-height: 100%;
+    font-family: 'Inter', sans-serif;
+
+    /* 🛡️ Professional Header Toggle */
+    &__header {
+        max-width: 1000px;
+        margin: 0 auto 24px;
+
+        .mode-toggle {
+            display: flex;
+            background: #fff;
+            padding: 8px;
+            border-radius: 50px;
+            box-shadow: 0 4px 12px rgb(0 0 0 / 5%);
+            border: 1px solid #eee;
+
+            .mode-btn {
+                flex: 1;
+                padding: 12px;
+                border-radius: 40px;
+                border: none;
+                background: transparent;
+                font-weight: 600;
+                color: #555;
+                cursor: pointer;
+                transition: all 0.3s ease;
+
+                &.active {
+                    background: var(--brand-red);
+                    color: #fff;
+                    box-shadow: 0 4px 10px rgb(255 68 79 / 30%);
+                }
+            }
+        }
+    }
+
+    /* 📊 Filter Bar */
+    &__filters {
+        max-width: 1200px;
+        margin: 0 auto 24px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        color: #555;
+        font-size: 14px;
+
+        .market-count {
+            color: #ff444f;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .growth-selectors {
+            display: flex;
+            gap: 8px;
+
+            .growth-btn {
+                padding: 6px 16px;
+                border: 1px solid #ddd;
+                border-radius: 20px;
+                background: #fff;
+                cursor: pointer;
+                transition: all 0.2s;
+
+                &:hover {
+                    background: #f0f0f0;
+                }
+
+                &.active {
+                    background: var(--brand-red);
+                    color: #fff;
+                    border-color: var(--brand-red);
+                }
+            }
+        }
+
+        .status-msg {
+            margin-left: auto;
+            color: #888;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            svg {
+                fill: #888;
+            }
+        }
+    }
+
+    /* 🗂️ Market Grid */
+    &__grid {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+        gap: 24px;
+        padding-bottom: 24px;
+        height: calc(100vh - 300px);
+        overflow-y: auto;
+        padding-right: 8px;
+
+        /* 🏎️ Professional Scrollbar */
+        &::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        &::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 10px;
+
+            &:hover {
+                background: #bbb;
+            }
+        }
+    }
+
+    /* 🃏 Accumulator Card */
+    .acc-card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 4px 15px rgb(0 0 0 / 4%);
+        border: 1px solid #f0f0f0;
+
+        &__top {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 20px;
+
+            .market-icon {
+                font-size: 24px;
+            }
+
+            .market-info {
+                .name {
+                    font-size: 18px;
+                    font-weight: 600;
+                    color: #333;
+                }
+
+                .price {
+                    font-size: 14px;
+                    color: #666;
+                    margin-top: 4px;
+                }
+            }
+        }
+
+        &__stats-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+
+            .stat-bubble {
+                padding: 4px 12px;
+                background: #f4f7f9;
+                border-radius: 20px;
+                font-size: 13px;
+                color: #555;
+                font-weight: 500;
+
+                &.active {
+                    background: #4caf50;
+                    color: #fff;
+                }
+            }
+        }
+
+        &__inputs {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 24px;
+            border-top: 1px solid #f9f9f9;
+            padding-top: 16px;
+
+            .input-group {
+                flex: 1;
+
+                label {
+                    display: block;
+                    font-size: 11px;
+                    color: #999;
+                    font-weight: bold;
+                    margin-bottom: 8px;
+                    text-transform: uppercase;
+                }
+
+                .input-wrapper {
+                    display: flex;
+                    align-items: center;
+                    background: #fff;
+                    border: 1px solid #eee;
+                    border-radius: 6px;
+                    padding: 8px 12px;
+
+                    input {
+                        width: 100%;
+                        border: none;
+                        outline: none;
+                        font-weight: 600;
+                        font-size: 14px;
+                        color: #333;
+                    }
+
+                    .unit {
+                        font-size: 12px;
+                        color: #999;
+                    }
+                }
+            }
+        }
+
+        &__summary {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+
+            .summary-item {
+                .label {
+                    font-size: 12px;
+                    color: #999;
+                    margin-bottom: 4px;
+                }
+
+                .value {
+                    font-size: 15px;
+                    font-weight: 600;
+                    color: #333;
+
+                    &.profit {
+                        color: #4caf50;
+                    }
+                }
+            }
+        }
+
+        &__buy-btn {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 20px;
+            background: linear-gradient(to right, #82bdb8, var(--brand-teal));
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+
+            &:hover {
+                opacity: 0.9;
+            }
+
+            .btn-label {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+        }
+    }
+
+    /* 🏁 Footer Bar */
+    &__footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: #fff;
+        border-top: 1px solid #eee;
+        padding: 12px 24px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        z-index: 100;
+
+        .run-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #002e7a;
+            color: #fff;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .bot-status {
+            flex: 1;
+            text-align: center;
+            font-size: 13px;
+            color: #666;
+            font-weight: 500;
+        }
+    }
+
+    /* 🔌 Auto Trader View */
+    &__auto-view {
+        padding: 0 10px;
+        max-width: 1400px;
+        margin: 0 auto;
+        padding-bottom: 100px;
+        height: calc(100vh - 300px);
+        overflow-y: auto;
+        padding-right: 8px;
+
+        /* 🏎️ Scrollbar Sync */
+        &::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 10px;
+        }
+
+        .auto-trader-dashboard {
+            background: #fff;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 12px rgb(0 0 0 / 5%);
+
+            .dashboard-label {
+                margin-bottom: 24px;
+
+                span {
+                    font-size: 10px;
+                    color: #888;
+                    font-weight: bold;
+                    letter-spacing: 1px;
+                }
+
+                h3 {
+                    margin: 4px 0;
+                    font-size: 20px;
+                    color: #333;
+                }
+            }
+
+            .dashboard-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 16px;
+                align-items: center;
+
+                .stat-card {
+                    background: #f8fafc;
+                    padding: 16px;
+                    border-radius: 8px;
+                    border: 1px solid #eee;
+
+                    label {
+                        display: block;
+                        font-size: 11px;
+                        color: #666;
+                        font-weight: bold;
+                        margin-bottom: 8px;
+                    }
+
+                    .val {
+                        font-size: 18px;
+                        font-weight: bold;
+                        color: #333;
+
+                        span {
+                            font-size: 12px;
+                            color: #888;
+                            margin-left: 4px;
+                        }
+
+                        small {
+                            display: block;
+                            font-size: 10px;
+                            font-weight: normal;
+                            color: #888;
+                            margin-top: 4px;
+                        }
+                    }
+
+                    &.highlight .val {
+                        color: #4caf50;
+                    }
+                }
+
+                .action-hub {
+                    flex: 1;
+
+                    .start-btn {
+                        width: 100%;
+                        background: linear-gradient(to right, #ff7179, var(--brand-red));
+                        color: #fff;
+                        border: none;
+                        padding: 12px;
+                        border-radius: 8px;
+                        font-weight: bold;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        gap: 8px;
+                        cursor: pointer;
+                        margin-bottom: 8px;
+                    }
+
+                    .engine-status {
+                        display: flex;
+                        align-items: center;
+                        gap: 6px;
+                        font-size: 11px;
+                        color: #666;
+                        margin-bottom: 4px;
+                    }
+
+                    small {
+                        font-size: 10px;
+                        color: #aaa;
+                    }
+                }
+            }
+        }
+
+        .strategy-ranking {
+            background: #fff;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgb(0 0 0 / 5%);
+
+            .ranking-header {
+                margin-bottom: 20px;
+
+                span {
+                    font-size: 10px;
+                    color: #888;
+                    font-weight: bold;
+                }
+
+                h4 {
+                    margin: 4px 0;
+                    font-size: 18px;
+                    color: #333;
+                }
+            }
+
+            .table-container {
+                border: 1px solid #eee;
+                border-radius: 8px;
+
+                .ranking-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    text-align: left;
+
+                    thead {
+                        position: sticky;
+                        top: 0;
+                        background: #f8fafc;
+                        z-index: 10;
+
+                        th {
+                            padding: 16px;
+                            font-size: 11px;
+                            color: #888;
+                            border-bottom: 1px solid #eee;
+                        }
+                    }
+
+                    tbody tr {
+                        border-bottom: 1px solid #f1f1f1;
+
+                        &:hover {
+                            background: #fcfcfc;
+                        }
+
+                        td {
+                            padding: 14px 16px;
+                            font-size: 13px;
+                            color: #444;
+                        }
+
+                        .market-cell {
+                            strong {
+                                display: block;
+                                font-size: 13px;
+                                color: #333;
+                            }
+
+                            span {
+                                font-size: 10px;
+                                color: #aaa;
+                                text-transform: uppercase;
+                            }
+                        }
+
+                        .score-pill {
+                            background: #f0f0f0;
+                            padding: 4px 10px;
+                            border-radius: 4px;
+                            font-size: 12px;
+                            color: #666;
+                        }
+
+                        .bullish {
+                            color: #4caf50;
+                            font-weight: bold;
+                        }
+
+                        .bearish {
+                            color: #ff444f;
+                            font-weight: bold;
+                        }
+
+                        .mono {
+                            font-family: 'Roboto Mono', monospace;
+                            font-size: 12px;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

@@ -12,7 +12,6 @@ import { useDevice } from '@deriv-com/ui';
 import { rudderStackSendRunBotEvent } from '../../analytics/rudderstack-common-events';
 import Button from '../shared_ui/button';
 import Tooltip from '../shared_ui/tooltip/tooltip';
-import CircularWrapper from './circular-wrapper';
 import ContractStageText from './contract-stage-text';
 import './run-panel-tooltip.scss';
 
@@ -183,56 +182,49 @@ const TradeAnimation = observer(({ className, should_show_overlay }: TTradeAnima
 
     return (
         <div className={classNames('animation__wrapper', className)}>
-            {should_show_tooltip ? (
-                <div className='run__button_wrapper'>
-                    <Tooltip
-                        alignment={determineTooltipAlignment()}
-                        message={localize('The Run button is disabled because no Bot has been created yet.')}
-                        icon='info'
-                        className='qs__tooltip'
-                    />
-                    <div style={{ opacity: 0.5, marginLeft: '8px' }}>
+            <div className='run__button_wrapper'>
+                {should_show_tooltip ? (
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <Tooltip
+                            alignment={determineTooltipAlignment()}
+                            message={localize('The Run button is disabled because no Bot has been created yet.')}
+                            icon='info'
+                            className='qs__tooltip'
+                        />
                         <Button
                             is_disabled={true}
                             className={button_props.class}
                             id={button_props.id}
                             icon={button_props.icon}
-                            onClick={() => {
-                                // Disabled button, no action
-                            }}
+                            onClick={() => {}}
                             has_effect
-                            {...(is_stop_button_visible || !is_unavailable_for_payment_agent
-                                ? { primary: true }
-                                : { green: true })}
+                            primary
                         >
                             {button_props.text}
                         </Button>
                     </div>
-                </div>
-            ) : (
-                <Button
-                    is_disabled={(is_disabled && !is_unavailable_for_payment_agent) || contract_stage === 3}
-                    className={button_props.class}
-                    id={button_props.id}
-                    icon={button_props.icon}
-                    onClick={() => {
-                        setShouldDisable(true);
-                        if (is_stop_button_visible) {
-                            onStopBotClick();
-                            return;
-                        }
-                        onRunButtonClick();
-                        // Cast to any to avoid TypeScript error with subpage_name
-                        rudderStackSendRunBotEvent({ subpage_name: safeActiveTab } as any);
-                    }}
-                    has_effect
-                    {...(is_stop_button_visible || !is_unavailable_for_payment_agent
-                        ? { primary: true }
-                        : { green: true })}
-                >
-                    {button_props.text}
-                </Button>
-            )}
+                ) : (
+                    <Button
+                        is_disabled={(is_disabled && !is_unavailable_for_payment_agent) || contract_stage === 3}
+                        className={button_props.class}
+                        id={button_props.id}
+                        icon={button_props.icon}
+                        onClick={() => {
+                            setShouldDisable(true);
+                            if (is_stop_button_visible) {
+                                onStopBotClick();
+                                return;
+                            }
+                            onRunButtonClick();
+                            rudderStackSendRunBotEvent({ subpage_name: safeActiveTab } as any);
+                        }}
+                        has_effect
+                        {...(is_stop_button_visible ? { primary: true } : { green: true })}
+                    >
+                        {button_props.text}
+                    </Button>
+                )}
+            </div>
             <div
                 className={classNames('animation__container', className, {
                     'animation--running': contract_stage > 0,
@@ -240,18 +232,11 @@ const TradeAnimation = observer(({ className, should_show_overlay }: TTradeAnima
                     'animation--disabled': is_disabled,
                 })}
             >
-                {show_overlay && <ContractResultOverlay profit={profit} />}
+                {show_overlay && <ContractResultOverlay profit={Number(profit || 0)} />}
                 <span className='animation__text'>
                     <ContractStageText contract_stage={contract_stage} />
                 </span>
-                <div className='animation__progress'>
-                    <div className='animation__progress-line'>
-                        <div className={`animation__progress-bar animation__progress-${contract_stage}`} />
-                    </div>
-                    {status_classes.map((status_class, i) => (
-                        <CircularWrapper key={`status_class-${status_class}-${i}`} className={status_class} />
-                    ))}
-                </div>
+                {contract_stage > 0 && <div className='animation__progress'>{/* Status ticker for clean look */}</div>}
             </div>
         </div>
     );

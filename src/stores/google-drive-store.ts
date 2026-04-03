@@ -97,6 +97,12 @@ export default class GoogleDriveStore {
     };
 
     initialiseClient = () => {
+        if (!this.client_id) {
+            // eslint-disable-next-line no-console
+            console.warn('Google Drive client_id is missing. Google Drive integration will be disabled.');
+            return;
+        }
+
         this.client = google.accounts.oauth2.initTokenClient({
             client_id: this.client_id,
             scope: this.scope,

@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm start)",
+      "Bash(npx *)",
+      "Bash(select-object *)"
+    ]
+  },
+  "$version": 3
+}

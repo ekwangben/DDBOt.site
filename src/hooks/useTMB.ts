@@ -105,7 +105,16 @@ const useTMB = (): UseTMBReturn => {
                         Accept: 'application/json',
                         'Content-Type': 'application/json',
                     },
+                }).catch(err => {
+                    // Handle CORS/Network failure gracefully on localhost
+                    if (window.location.hostname === 'localhost') {
+                        console.warn('[TMB] Session check blocked by CORS on localhost. Proceeding with manual auth.');
+                        return null;
+                    }
+                    throw err;
                 });
+
+                if (!response) return undefined;
 
                 if (!response.ok) {
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -131,7 +140,15 @@ const useTMB = (): UseTMBReturn => {
                     Accept: 'application/json',
                     'Content-Type': 'application/json',
                 },
+            }).catch(err => {
+                if (window.location.hostname === 'localhost') {
+                    console.warn('[TMB] Default session check blocked by CORS on localhost.');
+                    return null;
+                }
+                throw err;
             });
+
+            if (!response) return undefined;
 
             if (!response.ok) {
                 throw new Error(`HTTP ${response.status}: ${response.statusText}`);
@@ -140,7 +157,10 @@ const useTMB = (): UseTMBReturn => {
             const result = await response.json();
             return result as TMBWebsocketTokens;
         } catch (error) {
-            console.error('Failed to get active sessions:', error);
+            // Only log as error if not a CORS issue on localhost
+            if (window.location.hostname !== 'localhost') {
+                console.error('Failed to get active sessions:', error);
+            }
             return undefined;
         }
     }, []);

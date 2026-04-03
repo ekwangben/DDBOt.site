@@ -1,0 +1,114 @@
+.nav-bar {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    background-color: #00a79e;
+    padding: 0;
+    height: 48px;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 100;
+
+    &__tabs {
+        display: flex;
+        align-items: center;
+        gap: 0;
+        overflow-x: auto;
+        overflow-y: hidden;
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+        flex: 1;
+        min-width: 0;
+
+        &::-webkit-scrollbar {
+            display: none;
+        }
+    }
+
+    &__tab {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        padding: 0 1rem;
+        height: 48px;
+        background: transparent;
+        border: none;
+        border-bottom: 3px solid transparent;
+        color: #fff;
+        font-size: 1.5rem;
+        font-weight: 700;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: all 0.2s ease;
+        flex-shrink: 0;
+
+        &:hover {
+            background-color: rgb(255 255 255 / 10%);
+        }
+
+        &--active {
+            border-bottom-color: #fff;
+            background-color: rgb(255 255 255 / 15%);
+        }
+
+        svg {
+            flex-shrink: 0;
+            height: 24px;
+            width: 24px;
+        }
+    }
+
+    &__tab-label {
+        font-size: 1.5rem;
+        font-weight: 700;
+    }
+
+    &__actions {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+        flex-shrink: 0;
+        padding: 0 0.8rem;
+    }
+
+    &__run-button {
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+        padding: 0.4rem 0.8rem;
+        background-color: #00c853;
+        color: #000;
+        border: none;
+        border-radius: 3px;
+        font-size: 1.1rem;
+        font-weight: 700;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: opacity 0.2s ease;
+
+        &:hover {
+            opacity: 0.9;
+        }
+
+        svg {
+            flex-shrink: 0;
+        }
+    }
+
+    &__status {
+        display: flex;
+        align-items: center;
+        padding: 0.4rem 0.8rem;
+        background-color: transparent;
+        border-radius: 2px;
+        border: 1px solid rgb(255 255 255 / 30%);
+        min-width: 0;
+    }
+
+    &__status-text {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: rgb(255 255 255 / 90%);
+        white-space: nowrap;
+    }
+}

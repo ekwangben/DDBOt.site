@@ -4,7 +4,6 @@ import { ToastContainer } from 'react-toastify';
 import AuthLoadingWrapper from '@/components/auth-loading-wrapper';
 import useLiveChat from '@/components/chat/useLiveChat';
 import { BOT_RESTRICTED_COUNTRIES_LIST } from '@/components/layout/header/utils';
-import ChunkLoader from '@/components/loader/chunk-loader';
 import PWAInstallModal from '@/components/pwa-install-modal';
 import { getUrlBase } from '@/components/shared';
 import TncStatusUpdateModal from '@/components/tnc-status-update-modal';
@@ -26,17 +25,38 @@ import { localize } from '@deriv-com/translations';
 import Audio from '../components/audio';
 import BlocklyLoading from '../components/blockly-loading';
 import BotStopped from '../components/bot-stopped';
-import BotBuilder from '../pages/bot-builder';
+import LoadModal from '../components/load-modal';
+import SmartTradesLanding from '../components/smart-trades-landing/smart-trades-landing';
 import Main from '../pages/main';
 import './app.scss';
 import 'react-toastify/dist/ReactToastify.css';
 import '../components/bot-notification/bot-notification.scss';
 
 const AppContent = observer(() => {
+    const [is_minimum_loading_ready, setMinimumLoadingReady] = React.useState(false);
     const [is_api_initialized, setIsApiInitialized] = React.useState(false);
     const [is_loading, setIsLoading] = React.useState(true);
     const [is_eu_error_loading, setIsEuErrorLoading] = React.useState(true);
     const [offline_timeout, setOfflineTimeout] = React.useState(null);
+
+    React.useEffect(() => {
+        // Self-Healing: Force clear legacy App ID stored in localStorage on first load
+        // ensuring it picks up our new stable default (16929)
+        const has_healed = localStorage.getItem('pro_config_healed');
+        if (!has_healed) {
+            console.log('[PRO] Self-Healing: Clearing dynamic App ID and refreshing...');
+            localStorage.removeItem('config.app_id');
+            localStorage.setItem('pro_config_healed', 'true');
+            // Allow a tiny delay then reload once to apply clean slate
+            setTimeout(() => window.location.reload(), 200);
+            return;
+        }
+
+        const timer = setTimeout(() => {
+            setMinimumLoadingReady(true);
+        }, 10000); // 10 seconds
+        return () => clearTimeout(timer);
+    }, []);
     const store = useStore();
     const { app, transactions, common, client } = store;
     const { showDigitalOptionsMaltainvestError } = app;
@@ -289,10 +309,10 @@ const AppContent = observer(() => {
                         {/* <PWAInstallModalTest /> */}
                         <Audio />
                         <Main />
-                        <BotBuilder />
                         <BotStopped />
                         <TransactionDetailsModal />
                         <PWAInstallModal />
+                        <LoadModal />
                         <ToastContainer limit={3} draggable={false} />
                         <TncStatusUpdateModal />
                     </div>
@@ -301,8 +321,8 @@ const AppContent = observer(() => {
         );
     }
 
-    return is_loading ? (
-        <ChunkLoader message={getLoadingMessage()} />
+    return is_loading || !is_minimum_loading_ready ? (
+        <SmartTradesLanding message={getLoadingMessage()} />
     ) : (
         <AuthLoadingWrapper>
             <ThemeProvider theme={is_dark_mode_on ? 'dark' : 'light'}>
@@ -311,10 +331,10 @@ const AppContent = observer(() => {
                     {/* <PWAInstallModalTest /> */}
                     <Audio />
                     <Main />
-                    <BotBuilder />
                     <BotStopped />
                     <TransactionDetailsModal />
                     <PWAInstallModal />
+                    <LoadModal />
                     <ToastContainer limit={3} draggable={false} />
                     <TncStatusUpdateModal />
                 </div>

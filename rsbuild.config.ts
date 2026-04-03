@@ -1,6 +1,7 @@
 import { defineConfig } from '@rsbuild/core';
 import { pluginReact } from '@rsbuild/plugin-react';
 import { pluginSass } from '@rsbuild/plugin-sass';
+import { pluginBasicSsl } from '@rsbuild/plugin-basic-ssl';
 
 const path = require('path');
 
@@ -17,6 +18,7 @@ export default defineConfig({
             exclude: /node_modules/,
         }),
         pluginReact(),
+        pluginBasicSsl(),
     ],
     source: {
         entry: {
@@ -83,8 +85,9 @@ export default defineConfig({
         template: './index.html',
     },
     server: {
-        port: 5000,
+        port: 8443,
         host: '0.0.0.0',
+        https: true,
         compress: true,
         headers: {
             'Cross-Origin-Opener-Policy': 'unsafe-none',
