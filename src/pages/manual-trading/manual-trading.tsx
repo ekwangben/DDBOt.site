@@ -1,9 +1,9 @@
-import React, { useEffect, useRef,useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import TradeTypeSelector from '@/components/trade-type-selector';
 import chart_api from '@/external/bot-skeleton/services/api/chart-api';
 import { useStore } from '@/hooks/useStore';
-import { ChartMode, ChartTitle, DrawTools, Share,SmartChart, StudyLegend, Views } from '@deriv/deriv-charts';
+import { ChartMode, ChartTitle, DrawTools, Share, SmartChart, StudyLegend, Views } from '@deriv/deriv-charts';
 import { Localize } from '@deriv-com/translations';
 import '@deriv/deriv-charts/dist/smartcharts.css';
 import './manual-trading.scss';
@@ -149,7 +149,7 @@ const ManualTrading: React.FC = observer(() => {
 
     const ToolbarWidgets = () => (
         <div className='manual-trading__toolbar'>
-            <ChartMode />
+            <ChartMode updateChartType={chart_store?.updateChartType} />
             <StudyLegend />
             <Views />
             <DrawTools />
@@ -195,11 +195,11 @@ const ManualTrading: React.FC = observer(() => {
                     chartStatusListener={(v: boolean) => setChartStatus(!v)}
                     chartType={chartType}
                     isMobile={false}
-                    enabledNavigationWidget={true}
+                    enabledNavigationWidget={false}
                     granularity={granularity}
                     requestAPI={requestAPI}
-                    requestForget={() => {}}
-                    requestForgetStream={() => {}}
+                    requestForget={() => { }}
+                    requestForgetStream={() => { }}
                     requestSubscribe={requestSubscribe}
                     settings={settings}
                     symbol={chartSymbol}
@@ -208,7 +208,7 @@ const ManualTrading: React.FC = observer(() => {
                     getMarketsOrder={getMarketsOrder}
                     isLive
                     leftMargin={80}
-                    toolbarWidget={ToolbarWidgets}
+                    toolbarWidget={() => <ToolbarWidgets />}
                 />
             </div>
 
