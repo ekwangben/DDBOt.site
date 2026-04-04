@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite';
 import TradeTypeSelector from '@/components/trade-type-selector';
 import chart_api from '@/external/bot-skeleton/services/api/chart-api';
 import { useStore } from '@/hooks/useStore';
-import { ChartMode, ChartTitle, DrawTools, Share, SmartChart, StudyLegend, Views } from '@deriv/deriv-charts';
+import { ChartMode, ChartTitle, DrawTools, Share, SmartChart, StudyLegend, Views, ToolbarWidget } from '@deriv/deriv-charts';
 import { Localize } from '@deriv-com/translations';
 import '@deriv/deriv-charts/dist/smartcharts.css';
 import './manual-trading.scss';
@@ -30,6 +30,8 @@ const ManualTrading: React.FC = observer(() => {
     const setChartSubscriptionId = chart_store?.setChartSubscriptionId;
     const setChartStatus = chart_store?.setChartStatus;
     const getMarketsOrder = chart_store?.getMarketsOrder;
+    const updateChartType = chart_store?.updateChartType;
+    const updateGranularity = chart_store?.updateGranularity;
     const chart_subscription_id = chart_store?.chart_subscription_id;
 
     // Initialize chart_api and symbols
@@ -148,13 +150,18 @@ const ManualTrading: React.FC = observer(() => {
     };
 
     const ToolbarWidgets = () => (
-        <div className='manual-trading__toolbar'>
-            <ChartMode updateChartType={chart_store?.updateChartType} />
-            <StudyLegend />
-            <Views />
-            <DrawTools />
-            <Share />
-        </div>
+        <ToolbarWidget position='top'>
+            <ChartMode portalNodeId='modal_root' onChartType={updateChartType} onGranularity={updateGranularity} />
+            <StudyLegend portalNodeId='modal_root' searchInputClassName='data-hj-whitelist' />
+            <Views
+                portalNodeId='modal_root'
+                onChartType={updateChartType}
+                onGranularity={updateGranularity}
+                searchInputClassName='data-hj-whitelist'
+            />
+            <DrawTools portalNodeId='modal_root' />
+            <Share portalNodeId='modal_root' />
+        </ToolbarWidget>
     );
 
     if (isLoading && !showFallback) {
