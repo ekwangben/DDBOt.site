@@ -1,10 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { observer } from 'mobx-react-lite';
-import TradeTypeSelector from '@/components/trade-type-selector';
 import chart_api from '@/external/bot-skeleton/services/api/chart-api';
 import { useStore } from '@/hooks/useStore';
 import { ChartMode, ChartTitle, DrawTools, Share, SmartChart, StudyLegend, Views, ToolbarWidget } from '@deriv/deriv-charts';
-import { Localize } from '@deriv-com/translations';
 import '@deriv/deriv-charts/dist/smartcharts.css';
 import './manual-trading.scss';
 
@@ -14,8 +12,6 @@ const ManualTrading: React.FC = observer(() => {
     const [chartSymbol, setChartSymbol] = useState('R_100');
     const [granularity, setGranularity] = useState(0);
     const [chartType, setChartType] = useState('line');
-    const [showTradeTypeSelector, setShowTradeTypeSelector] = useState(false);
-    const [selectedTradeType, setSelectedTradeType] = useState<'multipliers' | 'options'>('multipliers');
     const [showFallback, setShowFallback] = useState(false);
     const chartSubscriptionIdRef = useRef<string | undefined>(undefined);
     const subscriptionsRef = useRef<Record<string, any>>({});
@@ -177,21 +173,6 @@ const ManualTrading: React.FC = observer(() => {
 
     return (
         <div className='manual-trading'>
-            {/* Start Trading Button */}
-            <div className='manual-trading__start-trade-bar'>
-                <button className='start-trade-button' onClick={() => setShowTradeTypeSelector(true)}>
-                    <svg width='20' height='20' viewBox='0 0 20 20' fill='currentColor'>
-                        <path d='M6.5 3.5l7 6.5-7 6.5V3.5z' />
-                    </svg>
-                    <Localize i18n_default_text='Start Trading' />
-                    {selectedTradeType && (
-                        <span className='selected-type'>
-                            ({selectedTradeType === 'multipliers' ? 'Multipliers' : 'Options'})
-                        </span>
-                    )}
-                </button>
-            </div>
-
             {/* Chart */}
             <div className='manual-trading__chart-wrapper' dir='ltr'>
                 <SmartChart
@@ -218,17 +199,6 @@ const ManualTrading: React.FC = observer(() => {
                     toolbarWidget={() => <ToolbarWidgets />}
                 />
             </div>
-
-            {/* Trade Type Selector Modal */}
-            {showTradeTypeSelector && (
-                <TradeTypeSelector
-                    onSelect={type => {
-                        setSelectedTradeType(type);
-                        console.log(`Selected trade type: ${type}`);
-                    }}
-                    onClose={() => setShowTradeTypeSelector(false)}
-                />
-            )}
         </div>
     );
 });
