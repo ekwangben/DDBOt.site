@@ -1,5 +1,6 @@
 import React from 'react';
 import classNames from 'classnames';
+import { useLocation,useNavigate } from 'react-router-dom';
 import {
     LabelPairedChartLineCaptionRegularIcon,
     LabelPairedObjectsColumnCaptionRegularIcon,
@@ -7,7 +8,7 @@ import {
     LabelPairedShieldCheckCaptionRegularIcon,
     LabelPairedUsersCaptionRegularIcon,
 } from '@deriv/quill-icons/LabelPaired';
-import { LegacyGuide1pxIcon } from '@deriv/quill-icons/Legacy';
+import { LegacyBuysellIcon,LegacyGuide1pxIcon } from '@deriv/quill-icons/Legacy';
 import { Localize } from '@deriv-com/translations';
 import './nav-bar.scss';
 
@@ -65,6 +66,10 @@ const TABS = [
 ];
 
 const NavBar: React.FC<TNavBarProps> = ({ activeTab, onTabChange }) => {
+    const navigate = useNavigate();
+    const location = useLocation();
+    const isManualTradingPage = location.pathname === '/manual-trading';
+
     return (
         <div className='nav-bar'>
             <div className='nav-bar__tabs'>
@@ -87,6 +92,20 @@ const NavBar: React.FC<TNavBarProps> = ({ activeTab, onTabChange }) => {
                         </button>
                     );
                 })}
+                {/* Manual Trading Tab - Route-based navigation */}
+                <button
+                    id='id-manual-trading'
+                    className={classNames('nav-bar__tab', {
+                        'nav-bar__tab--active': isManualTradingPage,
+                    })}
+                    onClick={() => navigate('/manual-trading')}
+                    type='button'
+                >
+                    <LegacyBuysellIcon height='16px' width='16px' fill='currentColor' />
+                    <span className='nav-bar__tab-label'>
+                        <Localize i18n_default_text='Manual Trading' />
+                    </span>
+                </button>
             </div>
             <div className='nav-bar__actions'>
                 <button className='nav-bar__run-button' type='button'>

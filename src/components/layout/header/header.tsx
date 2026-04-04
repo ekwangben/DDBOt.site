@@ -135,8 +135,8 @@ const AppHeader = observer(({ isAuthenticating }: TAppHeaderProps) => {
         } else {
             return (
                 <div className='auth-actions'>
-                    <Button
-                        tertiary
+                    <button
+                        className='login-link'
                         onClick={async () => {
                             clearAuthData(false);
                             const getQueryParams = new URLSearchParams(window.location.search);
@@ -145,13 +145,10 @@ const AppHeader = observer(({ isAuthenticating }: TAppHeaderProps) => {
                                 currency || sessionStorage.getItem('query_param_currency') || 'USD';
 
                             try {
-                                // First, explicitly wait for TMB status to be determined
                                 const tmbEnabled = await isTmbEnabled();
-                                // Now use the result of the explicit check
                                 if (tmbEnabled) {
-                                    await onRenderTMBCheck(true); // Pass true to indicate it's from login button
+                                    await onRenderTMBCheck(true);
                                 } else {
-                                    // Always use OIDC if TMB is not enabled
                                     try {
                                         await requestOidcAuthentication({
                                             redirectCallbackUri: `${window.location.origin}/callback`,
@@ -169,21 +166,20 @@ const AppHeader = observer(({ isAuthenticating }: TAppHeaderProps) => {
                                     }
                                 }
                             } catch (error) {
-                                // eslint-disable-next-line no-console
                                 console.error(error);
                             }
                         }}
                     >
                         <Localize i18n_default_text='Log in' />
-                    </Button>
-                    <Button
-                        primary
+                    </button>
+                    <button
+                        className='signup-button'
                         onClick={() => {
                             window.open(standalone_routes.signup);
                         }}
                     >
                         <Localize i18n_default_text='Sign up' />
-                    </Button>
+                    </button>
                 </div>
             );
         }
