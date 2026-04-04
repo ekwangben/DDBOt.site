@@ -71,7 +71,13 @@ export default class ChartStore {
             return block.type === 'trade_definition_market';
         });
 
-        const symbol = market_block?.getFieldValue('SYMBOL_LIST') ?? api_base?.active_symbols[0]?.symbol;
+        let symbol = market_block?.getFieldValue('SYMBOL_LIST') ?? api_base?.active_symbols[0]?.symbol;
+
+        // Fallback to valid default symbol if 'na' or undefined
+        if (!symbol || symbol === 'na' || symbol === 'undefined') {
+            symbol = 'R_100'; // Default to Volatility 100
+        }
+
         this.symbol = symbol;
     };
 
