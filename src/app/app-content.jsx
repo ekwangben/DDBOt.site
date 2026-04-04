@@ -177,8 +177,7 @@ const AppContent = observer(() => {
     );
 
     React.useEffect(() => {
-        setSmartChartsPublicPath(getUrlBase('/js/smartcharts/'));
-        console.log('[App] SmartCharts public path set to /js/smartcharts/');
+        // SmartCharts public path is now set in main.tsx before React mounts
     }, []);
 
     React.useEffect(() => {
