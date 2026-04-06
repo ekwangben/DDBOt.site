@@ -1,19 +1,25 @@
-import React, { useCallback, useEffect, useRef,useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { localize } from '@deriv-com/translations';
 import { api_base } from '@/external/bot-skeleton';
 import { useProposal } from '@/hooks/api/useProposal';
 import { useTradeExecution } from '@/hooks/api/useTradeExecution';
 import { useStore } from '@/hooks/useStore';
+import { TradeTypeSelector, TradeCategory } from './TradeTypeSelector';
+import { ContractParameters } from './ContractParameters';
 import './trade-form.scss';
 
 interface TradeFormProps {
     currentSymbol?: string;
 }
 
-interface DigitStat {
-    digit: number;
-    count: number;
-    percentage: number;
-}
+// Duration units
+const DURATION_UNITS = [
+    { value: 't', label: localize('Ticks') },
+    { value: 's', label: localize('Seconds') },
+    { value: 'm', label: localize('Minutes') },
+    { value: 'h', label: localize('Hours') },
+    { value: 'd', label: localize('Days') },
+];
 
 export const TradeForm: React.FC<TradeFormProps> = ({ currentSymbol }) => {
     const store = useStore();
@@ -22,179 +28,136 @@ export const TradeForm: React.FC<TradeFormProps> = ({ currentSymbol }) => {
     const isLoggedIn = client?.is_logged_in;
 
     const symbol = currentSymbol || 'R_100';
-    const [contractType, setContractType] = useState<string>('DIGITOVER'); // DIGITOVER or DIGITUNDER
+    const [tradeCategory, setTradeCategory] = useState<TradeCategory>('digits');
+    const [contractType, setContractType] = useState<string>('DIGITOVER');
     const [stake, setStake] = useState<number>(10);
     const [duration, setDuration] = useState<number>(5);
-    const [isApiReady, setIsApiReady] = useState(false);
-    const [digitStats, setDigitStats] = useState<DigitStat[]>([
-        { digit: 0, count: 0, percentage: 0 },
-        { digit: 1, count: 0, percentage: 0 },
-        { digit: 2, count: 0, percentage: 0 },
-        { digit: 3, count: 0, percentage: 0 },
-        { digit: 4, count: 0, percentage: 0 },
-        { digit: 5, count: 0, percentage: 0 },
-        { digit: 6, count: 0, percentage: 0 },
-        { digit: 7, count: 0, percentage: 0 },
-        { digit: 8, count: 0, percentage: 0 },
-        { digit: 9, count: 0, percentage: 0 },
-    ]);
+    const [durationUnit, setDurationUnit] = useState<string>('t');
+    const [barrier, setBarrier] = useState<number>(0);
+    const [barrier2, setBarrier2] = useState<number>(0);
+    const [selectedDigit, setSelectedDigit] = useState<number>(5);
     const [lastPrice, setLastPrice] = useState<string>('0.00');
 
-    const { buy, isLoading: isBuying, error: buyError } = useTradeExecution();
-    const { proposal: overProposal, requestProposal: requestOverProposal, isLoading: isOverLoading } = useProposal();
-    const { proposal: underProposal, requestProposal: requestUnderProposal, isLoading: isUnderLoading } = useProposal();
     const tickSubscriptionRef = useRef<string | null>(null);
-    const lastDigitMapRef = useRef<Record<number, number>>({
-        0: 0,
-        1: 0,
-        2: 0,
-        3: 0,
-        4: 0,
-        5: 0,
-        6: 0,
-        7: 0,
-        8: 0,
-        9: 0,
-    });
-    const totalTicksRef = useRef<number>(0);
 
-    // Initialize API and subscribe to ticks
+    const { buy, isLoading: isBuying, error: buyError } = useTradeExecution();
+    const {
+        proposal,
+        requestProposal,
+        isLoading: isProposalLoading,
+        error: proposalError,
+    } = useProposal();
+
+    // Subscribe to ticks for price display
     useEffect(() => {
-        const init = async () => {
+        if (!api_base.api) return;
+
+        const subscribeToTicks = async () => {
             try {
-                if (!api_base.api) {
-                    await api_base.init(true);
+                if (tickSubscriptionRef.current) {
+                    await api_base.api.forget(tickSubscriptionRef.current);
                 }
 
-                // Wait for API ready
-                const checkAPI = setInterval(() => {
-                    if (api_base.api) {
-                        clearInterval(checkAPI);
-                        setIsApiReady(true);
-                        subscribeToTicks();
-                    }
-                }, 500);
+                const response = await api_base.api.send({
+                    ticks: symbol,
+                    subscribe: 1,
+                });
 
-                setTimeout(() => clearInterval(checkAPI), 10000);
+                if (response.error) {
+                    console.error('Tick subscription error:', response.error.message);
+                    return;
+                }
+
+                if (response.subscription) {
+                    tickSubscriptionRef.current = response.subscription.id;
+                }
+
+                if (response.tick) {
+                    setLastPrice(response.tick.quote.toFixed(2));
+                }
+
+                api_base.api.onMessage().subscribe(({ data }: { data: Record<string, unknown> }) => {
+                    if (data.msg_type === 'tick' && (data as Record<string, { tick: { quote: number } }>).tick) {
+                        const tickData = data as Record<string, { tick: { quote: number } }>;
+                        setLastPrice(tickData.tick.quote.toFixed(2));
+                    }
+                });
             } catch (error) {
-                console.error('TradeForm init error:', error);
+                console.error('Failed to subscribe to ticks:', error);
             }
         };
 
-        init();
+        subscribeToTicks();
 
         return () => {
             if (tickSubscriptionRef.current && api_base.api) {
-                api_base.api.forget(tickSubscriptionRef.current);
+                api_base.api.forget(tickSubscriptionRef.current).catch(() => {
+                    // Ignore cleanup errors
+                });
             }
         };
     }, [symbol]);
 
-    const subscribeToTicks = async () => {
-        if (!api_base.api) return;
-
-        try {
-            // Forget previous subscription
-            if (tickSubscriptionRef.current) {
-                await api_base.api.forget(tickSubscriptionRef.current);
-            }
-
-            // Reset stats
-            lastDigitMapRef.current = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0 };
-            totalTicksRef.current = 0;
-
-            // Subscribe to ticks
-            const response = await api_base.api.send({
-                ticks: symbol,
-                subscribe: 1,
-            });
-
-            if (response.error) {
-                console.error('Tick subscription error:', response.error.message);
-                return;
-            }
-
-            if (response.subscription) {
-                tickSubscriptionRef.current = response.subscription.id;
-            }
-
-            if (response.tick) {
-                processTick(response.tick.quote);
-            }
-
-            // Listen to future ticks
-            api_base.api.onMessage().subscribe(({ data }: { data: Record<string, unknown> }) => {
-                if (data.msg_type === 'tick' && (data as Record<string, { tick: { quote: number } }>).tick) {
-                    const tickData = data as Record<string, { tick: { quote: number } }>;
-                    processTick(tickData.tick.quote);
-                }
-            });
-        } catch (error) {
-            console.error('Failed to subscribe to ticks:', error);
-        }
-    };
-
-    const processTick = (quote: number) => {
-        const priceStr = quote.toFixed(2);
-        const lastDigit = parseInt(priceStr.slice(-1));
-
-        setLastPrice(priceStr);
-
-        // Update digit statistics
-        const newMap = { ...lastDigitMapRef.current };
-        newMap[lastDigit] = (newMap[lastDigit] || 0) + 1;
-        lastDigitMapRef.current = newMap;
-        totalTicksRef.current++;
-
-        const total = totalTicksRef.current;
-        const stats: DigitStat[] = Array.from({ length: 10 }, (_, i) => ({
-            digit: i,
-            count: newMap[i] || 0,
-            percentage: total > 0 ? ((newMap[i] || 0) / total) * 100 : 0,
-        }));
-
-        setDigitStats(stats);
-    };
-
-    // Request proposals for both Over and Under
+    // Request proposal when parameters change
     useEffect(() => {
-        if (!isApiReady) return;
+        if (!symbol || !stake) return;
 
-        const fetchProposals = async () => {
+        const fetchProposal = async () => {
             try {
-                // Fetch Over proposal
-                requestOverProposal({
+                requestProposal({
                     symbol,
-                    contractType: 'DIGITOVER',
+                    contractType,
                     amount: stake,
                     currency,
-                    duration,
-                    durationUnit: 't',
-                    selectedDigit: 5, // Default barrier
-                }).catch(() => {});
-
-                // Fetch Under proposal
-                requestUnderProposal({
-                    symbol,
-                    contractType: 'DIGITUNDER',
-                    amount: stake,
-                    currency,
-                    duration,
-                    durationUnit: 't',
-                    selectedDigit: 5, // Default barrier
-                }).catch(() => {});
+                    duration: ['t', 's', 'm', 'h', 'd'].includes(durationUnit) ? duration : undefined,
+                    durationUnit: ['t', 's', 'm', 'h', 'd'].includes(durationUnit) ? durationUnit : undefined,
+                    barrier: barrier || undefined,
+                    barrier2: barrier2 || undefined,
+                    selectedDigit: ['DIGITOVER', 'DIGITUNDER', 'DIGITMATCH', 'DIGITDIFF'].includes(contractType)
+                        ? selectedDigit
+                        : undefined,
+                }).catch(() => {
+                    // Ignore proposal errors
+                });
             } catch (error) {
                 console.error('Proposal error:', error);
             }
         };
 
-        const debounce = setTimeout(fetchProposals, 300);
+        const debounce = setTimeout(fetchProposal, 300);
         return () => clearTimeout(debounce);
-    }, [symbol, stake, currency, duration, isApiReady]);
+    }, [
+        symbol,
+        contractType,
+        stake,
+        currency,
+        duration,
+        durationUnit,
+        barrier,
+        barrier2,
+        selectedDigit,
+    ]);
 
+    // Handle trade category change
+    const handleCategoryChange = useCallback((category: TradeCategory) => {
+        setTradeCategory(category);
+
+        // Set default contract type for category
+        const defaultContracts: Record<TradeCategory, string> = {
+            'rise-fall': 'CALL',
+            'high-low': 'HIGH',
+            digits: 'DIGITOVER',
+            turbo: 'CALL',
+            vanillas: 'CALL',
+        };
+
+        setContractType(defaultContracts[category] || 'CALL');
+    }, []);
+
+    // Handle buy
     const handleBuy = useCallback(async () => {
         if (!isLoggedIn) {
-            alert('Please log in to trade');
+            alert(localize('Please log in to trade'));
             return;
         }
 
@@ -204,8 +167,13 @@ export const TradeForm: React.FC<TradeFormProps> = ({ currentSymbol }) => {
                 contractType,
                 amount: stake,
                 currency,
-                duration,
-                durationUnit: 't',
+                duration: ['t', 's', 'm', 'h', 'd'].includes(durationUnit) ? duration : undefined,
+                durationUnit: ['t', 's', 'm', 'h', 'd'].includes(durationUnit) ? durationUnit : undefined,
+                barrier: barrier || undefined,
+                barrier2: barrier2 || undefined,
+                selectedDigit: ['DIGITOVER', 'DIGITUNDER', 'DIGITMATCH', 'DIGITDIFF'].includes(contractType)
+                    ? selectedDigit
+                    : undefined,
             });
 
             if (result) {
@@ -214,98 +182,86 @@ export const TradeForm: React.FC<TradeFormProps> = ({ currentSymbol }) => {
         } catch (error) {
             console.error('Buy error:', error);
         }
-    }, [isLoggedIn, symbol, contractType, stake, currency, duration, buy]);
+    }, [
+        isLoggedIn,
+        symbol,
+        contractType,
+        stake,
+        currency,
+        duration,
+        durationUnit,
+        barrier,
+        barrier2,
+        selectedDigit,
+        buy,
+    ]);
 
-    const overPayout = overProposal ? overProposal.payout : 0;
-    const underPayout = underProposal ? underProposal.payout : 0;
-    const overProfit = overProposal ? overProposal.payout - stake : 0;
-    const underProfit = underProposal ? underProposal.payout - stake : 0;
-    const overPercent = stake > 0 ? ((overProfit / stake) * 100).toFixed(2) : '0';
-    const underPercent = stake > 0 ? ((underProfit / stake) * 100).toFixed(2) : '0';
-
-    const error = buyError;
+    const payout = proposal ? proposal.payout : 0;
+    const profit = proposal ? proposal.payout - stake : 0;
+    const profitPercent = stake > 0 ? ((profit / stake) * 100).toFixed(2) : '0';
+    const error = buyError || proposalError;
 
     return (
         <div className='trade-form'>
             {/* Price Display */}
             <div className='trade-form__price'>
-                <span className='trade-form__price-label'>Price</span>
+                <span className='trade-form__price-label'>{localize('Price')}</span>
                 <span className='trade-form__price-value'>{lastPrice}</span>
             </div>
 
-            {/* Digit Statistics */}
-            <div className='trade-form__digit-stats'>
-                <label className='trade-form__label'>Digit Statistics</label>
-                <div className='digit-circles'>
-                    {digitStats.map(stat => (
-                        <div key={stat.digit} className='digit-stat'>
-                            <div className={`digit-circle digit-circle--stat`}>{stat.digit}</div>
-                            <span className='digit-stat__percent'>{stat.percentage.toFixed(1)}%</span>
-                        </div>
-                    ))}
-                </div>
-            </div>
-
             {/* Trade Type Selector */}
-            <div className='trade-form__field'>
-                <label className='trade-form__label'>Trade Type</label>
-                <div className='trade-form__trade-types'>
-                    <button className='trade-form__trade-type-btn active'>Over/Under</button>
-                    <button className='trade-form__trade-type-btn disabled'>Matches/Differs</button>
-                    <button className='trade-form__trade-type-btn disabled'>Even/Odd</button>
-                </div>
-            </div>
+            <TradeTypeSelector
+                selectedCategory={tradeCategory}
+                selectedContractType={contractType}
+                onCategoryChange={handleCategoryChange}
+                onContractTypeChange={setContractType}
+            />
 
-            {/* Over/Under Cards */}
-            <div className='trade-form__contracts'>
-                <div
-                    className={`trade-form__contract-card ${contractType === 'DIGITOVER' ? 'active' : ''}`}
-                    onClick={() => setContractType('DIGITOVER')}
-                >
-                    <div className='contract-card__header'>
-                        <span className='contract-card__title'>Over</span>
-                        <span className='contract-card__percent'>+{overPercent}%</span>
-                    </div>
-                    <div className='contract-card__payout'>
-                        <span className='contract-card__label'>Payout:</span>
-                        <span className='contract-card__value'>
-                            {currency} {overPayout.toFixed(2)}
-                        </span>
-                    </div>
-                    <div className='contract-card__check'>{contractType === 'DIGITOVER' && '✓'}</div>
-                </div>
-
-                <div
-                    className={`trade-form__contract-card ${contractType === 'DIGITUNDER' ? 'active' : ''}`}
-                    onClick={() => setContractType('DIGITUNDER')}
-                >
-                    <div className='contract-card__header'>
-                        <span className='contract-card__title'>Under</span>
-                        <span className='contract-card__percent'>+{underPercent}%</span>
-                    </div>
-                    <div className='contract-card__payout'>
-                        <span className='contract-card__label'>Payout:</span>
-                        <span className='contract-card__value'>
-                            {currency} {underPayout.toFixed(2)}
-                        </span>
-                    </div>
-                    <div className='contract-card__check'>{contractType === 'DIGITUNDER' && '✓'}</div>
-                </div>
-            </div>
+            {/* Contract Parameters (barrier, digit, etc.) */}
+            <ContractParameters
+                contractType={contractType}
+                barrier={barrier}
+                barrier2={barrier2}
+                selectedDigit={selectedDigit}
+                onBarrierChange={setBarrier}
+                onBarrier2Change={setBarrier2}
+                onDigitChange={setSelectedDigit}
+            />
 
             {/* Duration */}
             <div className='trade-form__field'>
-                <label className='trade-form__label'>Duration</label>
-                <div className='trade-form__duration-selector'>
-                    <button className='trade-form__duration-btn' onClick={() => setDuration(Math.max(1, duration - 1))}>
+                <label className='trade-form__label'>{localize('Duration')}</label>
+                <div className='trade-form__duration-group'>
+                    <button
+                        className='trade-form__duration-btn'
+                        onClick={() => setDuration(Math.max(1, duration - 1))}
+                    >
                         −
                     </button>
                     <div className='trade-form__duration-value'>
-                        {duration} {duration === 1 ? 'Tick' : 'Ticks'}
+                        <input
+                            type='number'
+                            className='trade-form__duration-input'
+                            value={duration}
+                            onChange={e => setDuration(Math.max(1, parseInt(e.target.value) || 1))}
+                            min={1}
+                            max={365}
+                        />
+                        <select
+                            className='trade-form__unit-select'
+                            value={durationUnit}
+                            onChange={e => setDurationUnit(e.target.value)}
+                        >
+                            {DURATION_UNITS.map(unit => (
+                                <option key={unit.value} value={unit.value}>
+                                    {unit.label}
+                                </option>
+                            ))}
+                        </select>
                     </div>
                     <button
                         className='trade-form__duration-btn'
-                        onClick={() => setDuration(Math.min(10, duration + 1))}
+                        onClick={() => setDuration(Math.min(365, duration + 1))}
                     >
                         +
                     </button>
@@ -314,14 +270,14 @@ export const TradeForm: React.FC<TradeFormProps> = ({ currentSymbol }) => {
 
             {/* Stake Input */}
             <div className='trade-form__field'>
-                <label className='trade-form__label'>Stake</label>
+                <label className='trade-form__label'>{localize('Stake')}</label>
                 <div className='trade-form__input-group'>
                     <span className='trade-form__currency'>{currency}</span>
                     <input
                         type='number'
                         className='trade-form__input'
                         value={stake}
-                        onChange={e => setStake(parseFloat(e.target.value) || 0)}
+                        onChange={e => setStake(Math.max(0.35, parseFloat(e.target.value) || 0))}
                         min={0.35}
                         max={50000}
                         step={0.01}
@@ -329,11 +285,32 @@ export const TradeForm: React.FC<TradeFormProps> = ({ currentSymbol }) => {
                 </div>
             </div>
 
+            {/* Payout Preview */}
+            {proposal && (
+                <div className='trade-form__payout'>
+                    <div className='trade-form__payout-row'>
+                        <span className='trade-form__payout-label'>{localize('Payout')}</span>
+                        <span className='trade-form__payout-value'>
+                            {currency} {payout.toFixed(2)}
+                        </span>
+                    </div>
+                    <div className='trade-form__payout-row'>
+                        <span className='trade-form__payout-label'>{localize('Profit')}</span>
+                        <span
+                            className='trade-form__payout-value'
+                            style={{ color: profit >= 0 ? '#4caf50' : '#ff444f' }}
+                        >
+                            +{profitPercent}% ({currency} {profit.toFixed(2)})
+                        </span>
+                    </div>
+                </div>
+            )}
+
             {/* Loading State */}
-            {(isOverLoading || isUnderLoading) && (
+            {(isBuying || isProposalLoading) && (
                 <div className='trade-form__loading'>
                     <div className='spinner-small' />
-                    <span>Loading...</span>
+                    <span>{isBuying ? localize('Processing...') : localize('Loading...')}</span>
                 </div>
             )}
 
@@ -344,18 +321,13 @@ export const TradeForm: React.FC<TradeFormProps> = ({ currentSymbol }) => {
             <button
                 className={`trade-form__buy-btn ${isBuying || !isLoggedIn ? 'disabled' : ''}`}
                 onClick={handleBuy}
-                disabled={
-                    isBuying ||
-                    !isLoggedIn ||
-                    (contractType === 'DIGITOVER' && !overProposal) ||
-                    (contractType === 'DIGITUNDER' && !underProposal)
-                }
+                disabled={isBuying || !isLoggedIn}
             >
                 {!isLoggedIn
-                    ? 'Log in to trade'
+                    ? localize('Log in to trade')
                     : isBuying
-                      ? 'Processing...'
-                      : `Buy ${contractType === 'DIGITOVER' ? 'Over' : 'Under'}`}
+                        ? localize('Processing...')
+                        : localize('Buy')}
             </button>
         </div>
     );

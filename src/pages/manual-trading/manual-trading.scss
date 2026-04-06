@@ -30,6 +30,31 @@
         border-left: 1px solid #e0e0e0;
         background: #fff;
         overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+
+    &__toggle-positions {
+        padding: 1rem;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    &__positions-btn {
+        width: 100%;
+        padding: 1rem;
+        border: 1px solid #e0e0e0;
+        background: #f9f9f9;
+        border-radius: 6px;
+        font-size: 1.4rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        color: #333;
+
+        &:hover {
+            background: #f0f0f0;
+            border-color: #00a79e;
+        }
     }
 
     &__loading {

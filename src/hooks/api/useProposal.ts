@@ -12,7 +12,8 @@ export interface ProposalParams {
     currency: string;
     duration?: number;
     durationUnit?: string;
-    barrier?: string;
+    barrier?: number | string;
+    barrier2?: number | string;
     selectedDigit?: number;
 }
 
@@ -73,8 +74,9 @@ export const useProposal = () => {
                 symbol: params.symbol,
                 ...(params.duration && { duration: params.duration }),
                 ...(params.durationUnit && { duration_unit: params.durationUnit }),
-                ...(params.barrier && { barrier: params.barrier }),
-                ...(params.selectedDigit !== undefined && { selected_tick: params.selectedDigit }),
+                ...(params.barrier && { barrier: params.barrier.toString() }),
+                ...(params.barrier2 && { barrier2: params.barrier2.toString() }),
+                ...(params.selectedDigit !== undefined && { barrier: params.selectedDigit.toString() }),
             };
 
             const response = await api_base.api!.send(proposalRequest);

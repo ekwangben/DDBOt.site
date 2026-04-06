@@ -1,0 +1,68 @@
+.trade-type-selector {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    &__categories {
+        display: flex;
+        gap: 4px;
+        background: #f5f5f5;
+        padding: 4px;
+        border-radius: 8px;
+    }
+
+    &__category-btn {
+        flex: 1;
+        padding: 8px 4px;
+        border: none;
+        background: transparent;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        color: #666;
+        cursor: pointer;
+        transition: all 0.2s;
+
+        &:hover {
+            background: #e0e0e0;
+        }
+
+        &.active {
+            background: #fff;
+            color: #00a79e;
+            box-shadow: 0 1px 3px rgb(0 0 0 / 10%);
+        }
+    }
+
+    &__contracts {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+
+    &__contract-btn {
+        flex: 1;
+        min-width: 60px;
+        padding: 10px 8px;
+        border: 1px solid #e0e0e0;
+        background: #fff;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 600;
+        color: #333;
+        cursor: pointer;
+        transition: all 0.2s;
+
+        &:hover {
+            border-color: #00a79e;
+            background: #f0f9f8;
+        }
+
+        &.active {
+            background: linear-gradient(135deg, #82bdb8, #00a79e);
+            color: #fff;
+            border-color: #00a79e;
+            box-shadow: 0 2px 6px rgb(0 167 158 / 30%);
+        }
+    }
+}

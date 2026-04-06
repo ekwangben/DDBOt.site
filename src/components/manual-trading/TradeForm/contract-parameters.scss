@@ -1,0 +1,88 @@
+.contract-parameters {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    &__label {
+        font-size: 11px;
+        font-weight: 700;
+        color: #666;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    &__input {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #333;
+        background: #fff;
+        transition: border-color 0.2s;
+
+        &:focus {
+            outline: none;
+            border-color: #00a79e;
+        }
+    }
+
+    &__double-barrier {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+
+    &__field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    &__digit-selector {
+        display: flex;
+        gap: 6px;
+        justify-content: space-between;
+    }
+
+    &__digit-btn {
+        flex: 1;
+        padding: 10px 4px;
+        border: 1px solid #e0e0e0;
+        background: #fff;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #333;
+        cursor: pointer;
+        transition: all 0.2s;
+
+        &:hover {
+            border-color: #00a79e;
+            background: #f0f9f8;
+        }
+
+        &.active {
+            background: linear-gradient(135deg, #82bdb8, #00a79e);
+            color: #fff;
+            border-color: #00a79e;
+            box-shadow: 0 2px 6px rgb(0 167 158 / 30%);
+        }
+    }
+
+    &__even-odd {
+        display: flex;
+    }
+
+    &__prediction {
+        flex: 1;
+        padding: 12px;
+        background: #f0f9f8;
+        border-radius: 6px;
+        text-align: center;
+        font-size: 14px;
+        font-weight: 600;
+        color: #00a79e;
+    }
+}

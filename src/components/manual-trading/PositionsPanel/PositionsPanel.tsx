@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef,useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { api_base } from '@/external/bot-skeleton';
 import { useStore } from '@/hooks/useStore';
 import './positions-panel.scss';
@@ -17,7 +17,11 @@ interface Position {
     expiry_time: number;
 }
 
-export const PositionsPanel: React.FC = () => {
+interface PositionsPanelProps {
+    onBack?: () => void;
+}
+
+export const PositionsPanel: React.FC<PositionsPanelProps> = ({ onBack }) => {
     const store = useStore();
     const client = store?.client;
     const currency = client?.currency || 'USD';
@@ -25,7 +29,31 @@ export const PositionsPanel: React.FC = () => {
 
     const [activeTab, setActiveTab] = useState<'open' | 'closed'>('open');
     const [positions, setPositions] = useState<Position[]>([]);
+    const [sellingId, setSellingId] = useState<string | null>(null);
     const subscriptionIdRef = useRef<string | null>(null);
+
+    // Sell position
+    const handleSell = useCallback(async (contractId: string) => {
+        if (!api_base.api) return;
+        setSellingId(contractId);
+        try {
+            const response = await api_base.api.send({
+                sell: contractId,
+                price: 0, // sell at market price
+            });
+
+            if (response.error) {
+                alert(response.error.message || 'Failed to sell position');
+            } else {
+                console.log('Position sold:', response);
+            }
+        } catch (error) {
+            console.error('Sell error:', error);
+            alert('Failed to sell position');
+        } finally {
+            setSellingId(null);
+        }
+    }, []);
 
     // Subscribe to contract updates
     const subscribeToContracts = useCallback(async () => {
@@ -130,7 +158,14 @@ export const PositionsPanel: React.FC = () => {
     return (
         <div className='positions-panel'>
             <div className='positions-panel__header'>
-                <h3>Positions</h3>
+                <div className='positions-panel__header-left'>
+                    {onBack && (
+                        <button className='positions-panel__back-btn' onClick={onBack}>
+                            ←
+                        </button>
+                    )}
+                    <h3>Positions</h3>
+                </div>
             </div>
 
             <div className='positions-panel__tabs'>
@@ -204,6 +239,17 @@ export const PositionsPanel: React.FC = () => {
                                         </div>
                                     )}
                                 </div>
+                                {!position.is_sold && (
+                                    <button
+                                        className='position-item__sell-btn'
+                                        onClick={() => handleSell(position.contract_id)}
+                                        disabled={sellingId === position.contract_id}
+                                    >
+                                        {sellingId === position.contract_id
+                                            ? 'Selling...'
+                                            : `Sell (${formatCurrency(position.bid_price || 0, position.currency || currency)})`}
+                                    </button>
+                                )}
                             </div>
                         ))}
                     </div>

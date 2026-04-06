@@ -1,4 +1,4 @@
-import { useCallback, useRef,useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { api_base } from '@/external/bot-skeleton';
 
 export interface TradeParams {
@@ -10,6 +10,9 @@ export interface TradeParams {
     durationUnit?: string;
     growthRate?: number; // For accumulator contracts
     basis?: 'stake' | 'payout';
+    barrier?: number; // For high/low contracts
+    barrier2?: number; // For range contracts
+    selectedDigit?: number; // For digit contracts
 }
 
 export interface TradeResult {
@@ -92,6 +95,9 @@ export const useTradeExecution = () => {
                 ...(params.duration && { duration: params.duration }),
                 ...(params.durationUnit && { duration_unit: params.durationUnit }),
                 ...(params.growthRate && { growth_rate: params.growthRate }),
+                ...(params.barrier && { barrier: params.barrier.toString() }),
+                ...(params.barrier2 && { barrier2: params.barrier2.toString() }),
+                ...(params.selectedDigit !== undefined && { barrier: params.selectedDigit.toString() }),
             };
 
             const proposalResponse = await sendWithRetry(proposalRequest);

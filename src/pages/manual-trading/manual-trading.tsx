@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { DigitStatistics } from '@/components/manual-trading/DigitStatistics';
 import { TradeForm } from '@/components/manual-trading/TradeForm';
+import { PositionsPanel } from '@/components/manual-trading/PositionsPanel';
 import chart_api from '@/external/bot-skeleton/services/api/chart-api';
 import { useStore } from '@/hooks/useStore';
 import {
@@ -24,6 +25,7 @@ const ManualTrading: React.FC = observer(() => {
     const [granularity, setGranularity] = useState(0);
     const [chartType, setChartType] = useState('line');
     const [showFallback, setShowFallback] = useState(false);
+    const [showPositions, setShowPositions] = useState(false);
     const chartSubscriptionIdRef = useRef<string | undefined>(undefined);
     const subscriptionsRef = useRef<Record<string, any>>({});
 
@@ -213,7 +215,7 @@ const ManualTrading: React.FC = observer(() => {
                             enabledNavigationWidget={true}
                             granularity={granularity}
                             requestAPI={requestAPI}
-                            requestForget={() => {}}
+                            requestForget={() => { }}
                             requestForgetStream={requestForgetStream}
                             requestSubscribe={requestSubscribe}
                             settings={settings}
@@ -233,7 +235,21 @@ const ManualTrading: React.FC = observer(() => {
 
                 {/* Trade Form Panel */}
                 <div className='manual-trading__trade-panel'>
-                    <TradeForm currentSymbol={chartSymbol} />
+                    {!showPositions ? (
+                        <>
+                            <div className='manual-trading__toggle-positions'>
+                                <button
+                                    className='manual-trading__positions-btn'
+                                    onClick={() => setShowPositions(true)}
+                                >
+                                    📊 View Positions
+                                </button>
+                            </div>
+                            <TradeForm currentSymbol={chartSymbol} />
+                        </>
+                    ) : (
+                        <PositionsPanel onBack={() => setShowPositions(false)} />
+                    )}
                 </div>
             </div>
         </div>
