@@ -1,8 +1,19 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { observer } from 'mobx-react-lite';
+import { DigitStatistics } from '@/components/manual-trading/DigitStatistics';
+import { TradeForm } from '@/components/manual-trading/TradeForm';
 import chart_api from '@/external/bot-skeleton/services/api/chart-api';
 import { useStore } from '@/hooks/useStore';
-import { ChartMode, ChartTitle, DrawTools, Share, SmartChart, StudyLegend, Views, ToolbarWidget } from '@deriv/deriv-charts';
+import {
+    ChartMode,
+    ChartTitle,
+    DrawTools,
+    Share,
+    SmartChart,
+    StudyLegend,
+    ToolbarWidget,
+    Views,
+} from '@deriv/deriv-charts';
 import '@deriv/deriv-charts/dist/smartcharts.css';
 import './manual-trading.scss';
 
@@ -99,8 +110,12 @@ const ManualTrading: React.FC = observer(() => {
         return () => clearTimeout(timer);
     }, [isLoading]);
 
+    // Initialize Deriv API for trading
+    // (Already handled in chart init useEffect above)
+
     const requestAPI = async (req: any) => {
         try {
+            if (!chart_api.api) return null;
             const response = await chart_api.api.send(req);
             return response;
         } catch (error: any) {
@@ -114,11 +129,15 @@ const ManualTrading: React.FC = observer(() => {
     };
 
     const requestForgetStream = (subscription_id: string) => {
-        subscription_id && chart_api.api.forget(subscription_id);
+        if (chart_api.api && subscription_id) {
+            chart_api.api.forget(subscription_id);
+        }
     };
 
     const requestSubscribe = async (req: any, callback: (data: any) => void) => {
         try {
+            if (!chart_api.api) return;
+
             requestForgetStream(chartSubscriptionIdRef.current);
             const history = await chart_api.api.send(req);
             setChartSubscriptionId(history?.subscription?.id);
@@ -141,7 +160,7 @@ const ManualTrading: React.FC = observer(() => {
         countdown: true,
         isHighestLowestMarkerEnabled: false,
         language: common?.current_language?.toLowerCase() || 'en',
-        position: 'bottom' as const,
+        position: 'bottom',
         theme: ui?.is_dark_mode_on ? 'dark' : 'light',
     };
 
@@ -171,33 +190,51 @@ const ManualTrading: React.FC = observer(() => {
 
     const is_connection_opened = !!chart_api?.api;
 
+    const handleSymbolChange = (newSymbol: string) => {
+        if (onSymbolChange) {
+            onSymbolChange(newSymbol);
+        }
+    };
+
     return (
         <div className='manual-trading'>
-            {/* Chart */}
-            <div className='manual-trading__chart-wrapper' dir='ltr'>
-                <SmartChart
-                    id='manual-trading-chart'
-                    showLastDigitStats={false}
-                    chartControlsWidgets={null}
-                    enabledChartFooter={false}
-                    chartStatusListener={(v: boolean) => setChartStatus(!v)}
-                    chartType={chartType}
-                    isMobile={false}
-                    enabledNavigationWidget={false}
-                    granularity={granularity}
-                    requestAPI={requestAPI}
-                    requestForget={() => { }}
-                    requestForgetStream={() => { }}
-                    requestSubscribe={requestSubscribe}
-                    settings={settings}
-                    symbol={chartSymbol}
-                    topWidgets={() => <ChartTitle onChange={onSymbolChange} />}
-                    isConnectionOpened={is_connection_opened}
-                    getMarketsOrder={getMarketsOrder}
-                    isLive
-                    leftMargin={80}
-                    toolbarWidget={() => <ToolbarWidgets />}
-                />
+            <div className='manual-trading__layout'>
+                {/* Chart Section */}
+                <div className='manual-trading__chart-section'>
+                    <div className='manual-trading__chart-wrapper' dir='ltr'>
+                        <SmartChart
+                            id='dbot'
+                            showLastDigitStats={false}
+                            chartControlsWidgets={null}
+                            enabledChartFooter={false}
+                            chartStatusListener={(v: boolean) => setChartStatus(!v)}
+                            chartType={chartType}
+                            isMobile={false}
+                            enabledNavigationWidget={true}
+                            granularity={granularity}
+                            requestAPI={requestAPI}
+                            requestForget={() => {}}
+                            requestForgetStream={requestForgetStream}
+                            requestSubscribe={requestSubscribe}
+                            settings={settings}
+                            symbol={chartSymbol}
+                            topWidgets={() => <ChartTitle onChange={handleSymbolChange} />}
+                            isConnectionOpened={is_connection_opened}
+                            getMarketsOrder={getMarketsOrder}
+                            isLive
+                            leftMargin={80}
+                            toolbarWidget={() => <ToolbarWidgets />}
+                        />
+                    </div>
+
+                    {/* Digit Statistics - Below Chart */}
+                    <DigitStatistics />
+                </div>
+
+                {/* Trade Form Panel */}
+                <div className='manual-trading__trade-panel'>
+                    <TradeForm currentSymbol={chartSymbol} />
+                </div>
             </div>
         </div>
     );

@@ -1,0 +1,146 @@
+.positions-panel {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: #fff;
+
+    &__header {
+        padding: 1.6rem;
+        border-bottom: 1px solid #e0e0e0;
+
+        h3 {
+            margin: 0;
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #333;
+        }
+    }
+
+    &__tabs {
+        display: flex;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    &__tab {
+        flex: 1;
+        padding: 1.2rem;
+        border: none;
+        background: transparent;
+        font-size: 1.4rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        color: #666;
+        border-bottom: 2px solid transparent;
+
+        &:hover {
+            background: #f5f5f5;
+        }
+
+        &.active {
+            color: #f44;
+            border-bottom-color: #f44;
+        }
+    }
+
+    &__content {
+        flex: 1;
+        overflow-y: auto;
+    }
+
+    &__empty {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 4rem 2rem;
+
+        p {
+            font-size: 1.4rem;
+            color: #999;
+            text-align: center;
+            margin: 0;
+        }
+    }
+}
+
+.positions-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.position-item {
+    padding: 1.6rem;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background 0.2s;
+
+    &:hover {
+        background: #f8f9fa;
+    }
+
+    &:last-child {
+        border-bottom: none;
+    }
+}
+
+.position-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.position-symbol {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #333;
+}
+
+.position-status {
+    padding: 0.4rem 1rem;
+    border-radius: 12px;
+    font-size: 1.2rem;
+    font-weight: 600;
+
+    &.open {
+        background: #e6f7ee;
+        color: #00a53d;
+    }
+
+    &.closed {
+        background: #ffe6e6;
+        color: #c00;
+    }
+}
+
+.position-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+}
+
+.position-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.3rem;
+
+    span:first-child {
+        color: #666;
+    }
+
+    span:last-child {
+        color: #333;
+        font-weight: 500;
+    }
+}
+
+.position-pl {
+    font-weight: 700 !important;
+
+    &.profit {
+        color: #00a53d !important;
+    }
+
+    &.loss {
+        color: #c00 !important;
+    }
+}
