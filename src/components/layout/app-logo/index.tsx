@@ -20,7 +20,8 @@ export const AppLogo = () => {
         setIsDropdownOpen(false);
         localStorage.setItem('trading_mode', mode);
         if (mode === 'manual') {
-            navigate('/manual-trading');
+            // Navigate to manual trading tab via hash
+            navigate('/#manual_trading');
         }
         if (mode === 'bot') {
             navigate('/');

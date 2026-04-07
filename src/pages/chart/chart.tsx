@@ -46,6 +46,7 @@ const Chart = observer(({ show_digits_stats }: { show_digits_stats: boolean }) =
         updateChartType,
         updateGranularity,
         updateSymbol,
+        initializeSymbol,
         setChartSubscriptionId,
         chart_subscription_id,
     } = chart_store;
@@ -71,6 +72,7 @@ const Chart = observer(({ show_digits_stats }: { show_digits_stats: boolean }) =
         updateChartType,
         updateGranularity,
         updateSymbol,
+        initializeSymbol,
         setChartSubscriptionId,
         chart_subscription_id,
     });
@@ -94,8 +96,10 @@ const Chart = observer(({ show_digits_stats }: { show_digits_stats: boolean }) =
     }, [chart_subscription_id]);
 
     useEffect(() => {
-        if (!symbol) updateSymbol();
-    }, [symbol, updateSymbol]);
+        if (!symbol || symbol === 'na' || symbol === 'undefined') {
+            initializeSymbol();
+        }
+    }, [symbol, initializeSymbol]);
 
     const requestAPI = (req: ServerTimeRequest | ActiveSymbolsRequest | TradingTimesRequest) => {
         return chart_api.api.send(req);

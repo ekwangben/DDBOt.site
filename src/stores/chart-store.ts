@@ -18,6 +18,7 @@ export default class ChartStore {
             granularity: observable,
             is_contract_ended: computed,
             updateSymbol: action,
+            initializeSymbol: action,
             onSymbolChange: action,
             updateGranularity: action,
             updateChartType: action,
@@ -55,8 +56,8 @@ export default class ChartStore {
         return transactions.contracts.length > 0 && transactions.contracts[0].is_ended;
     }
 
-    onStartBot = () => {
-        this.updateSymbol();
+    onStartBot = async () => {
+        await this.updateSymbol();
     };
 
     // eslint-disable-next-line
@@ -65,15 +66,31 @@ export default class ChartStore {
         // main_content.setActiveTab(tabs_title.WORKSPACE);
     };
 
-    updateSymbol = () => {
+    updateSymbol = async () => {
         const workspace = window.Blockly.derivWorkspace;
         const market_block = workspace?.getAllBlocks().find((block: window.Blockly.Block) => {
             return block.type === 'trade_definition_market';
         });
 
-        let symbol = market_block?.getFieldValue('SYMBOL_LIST') ?? api_base?.active_symbols[0]?.symbol;
+        let symbol = market_block?.getFieldValue('SYMBOL_LIST');
 
-        // Fallback to valid default symbol if 'na' or undefined
+        // If no symbol from workspace, try to get from api_base active_symbols
+        if (!symbol || symbol === 'na' || symbol === 'undefined') {
+            // Wait for active_symbols to be available if not already loaded
+            if (api_base?.active_symbols && api_base.active_symbols.length > 0) {
+                symbol = api_base.active_symbols[0]?.symbol;
+            } else {
+                // If active_symbols not loaded yet, wait for them
+                try {
+                    await api_base?.getActiveSymbols?.();
+                    symbol = api_base?.active_symbols?.[0]?.symbol;
+                } catch (error) {
+                    console.warn('[ChartStore] Failed to fetch active symbols, using default', error);
+                }
+            }
+        }
+
+        // Fallback to valid default symbol if still no symbol or invalid
         if (!symbol || symbol === 'na' || symbol === 'undefined') {
             symbol = 'R_100'; // Default to Volatility 100
         }
@@ -126,6 +143,47 @@ export default class ChartStore {
             }
         } catch {
             LocalStore.remove('bot.chart_props');
+        }
+    };
+
+    // Initialize symbol if not set
+    initializeSymbol = async () => {
+        // If symbol is already set from storage, don't override
+        if (this.symbol && this.symbol !== 'na' && this.symbol !== 'undefined') {
+            return;
+        }
+
+        // Try to get from workspace first
+        const workspace = window.Blockly?.derivWorkspace;
+        if (workspace) {
+            const market_block = workspace.getAllBlocks().find((block: window.Blockly.Block) => {
+                return block.type === 'trade_definition_market';
+            });
+
+            const workspaceSymbol = market_block?.getFieldValue('SYMBOL_LIST');
+            if (workspaceSymbol && workspaceSymbol !== 'na' && workspaceSymbol !== 'undefined') {
+                this.symbol = workspaceSymbol;
+                return;
+            }
+        }
+
+        // Try to get from api_base active_symbols
+        if (api_base?.active_symbols && api_base.active_symbols.length > 0) {
+            this.symbol = api_base.active_symbols[0]?.symbol || 'R_100';
+            return;
+        }
+
+        // Wait for active_symbols to load
+        try {
+            await api_base?.getActiveSymbols?.();
+            if (api_base?.active_symbols && api_base.active_symbols.length > 0) {
+                this.symbol = api_base.active_symbols[0]?.symbol || 'R_100';
+            } else {
+                this.symbol = 'R_100';
+            }
+        } catch (error) {
+            console.warn('[ChartStore] Failed to fetch active symbols, using default', error);
+            this.symbol = 'R_100';
         }
     };
 

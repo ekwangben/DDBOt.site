@@ -35,6 +35,7 @@ const FreeBots = lazy(() => import('../free-bots'));
 const AnalysisTool = lazy(() => import('../analysis-tool'));
 const CopyTrading = lazy(() => import('../copy-trading'));
 const RiskManagement = lazy(() => import('../risk-management'));
+const ManualTrading = lazy(() => import('../manual-trading'));
 
 const AppWrapper = observer(() => {
     const { connectionStatus } = useApiBase();
@@ -67,6 +68,7 @@ const AppWrapper = observer(() => {
         'analysis_tool',
         'copy_trading',
         'risk_management',
+        'manual_trading',
     ];
     const { isDesktop } = useDevice();
     const location = useLocation();
@@ -76,7 +78,9 @@ const AppWrapper = observer(() => {
     const GetHashedValue = (tab: number) => {
         tab_value = location.hash?.split('#')[1];
         if (!tab_value) return tab;
-        return Number(hash.indexOf(String(tab_value)));
+        const hashIndex = hash.indexOf(String(tab_value));
+        // Return the found index or default to the current tab
+        return hashIndex >= 0 ? hashIndex : tab;
     };
     const active_hash_tab = GetHashedValue(active_tab);
 
@@ -278,6 +282,17 @@ const AppWrapper = observer(() => {
                                     }
                                 >
                                     <RiskManagement />
+                                </Suspense>
+                            </div>
+                        )}
+                        {active_tab === 9 && (
+                            <div className='manual-trading-wrapper'>
+                                <Suspense
+                                    fallback={
+                                        <ChunkLoader message={localize('Please wait, loading manual trading...')} />
+                                    }
+                                >
+                                    <ManualTrading />
                                 </Suspense>
                             </div>
                         )}

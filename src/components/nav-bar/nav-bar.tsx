@@ -1,6 +1,6 @@
 import React from 'react';
 import classNames from 'classnames';
-import { useLocation,useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import {
     LabelPairedChartLineCaptionRegularIcon,
     LabelPairedObjectsColumnCaptionRegularIcon,
@@ -8,7 +8,7 @@ import {
     LabelPairedShieldCheckCaptionRegularIcon,
     LabelPairedUsersCaptionRegularIcon,
 } from '@deriv/quill-icons/LabelPaired';
-import { LegacyBuysellIcon,LegacyGuide1pxIcon } from '@deriv/quill-icons/Legacy';
+import { LegacyBuysellIcon, LegacyGuide1pxIcon } from '@deriv/quill-icons/Legacy';
 import { Localize } from '@deriv-com/translations';
 import './nav-bar.scss';
 
@@ -67,8 +67,29 @@ const TABS = [
 
 const NavBar: React.FC<TNavBarProps> = ({ activeTab, onTabChange }) => {
     const navigate = useNavigate();
-    const location = useLocation();
-    const isManualTradingPage = location.pathname === '/manual-trading';
+
+    // Sync hash-based navigation with React Router for deep linking
+    const handleTabChange = (index: number) => {
+        onTabChange(index);
+        // Navigate to root with hash for URL consistency
+        navigate(`/#${getHashForTab(index)}`);
+    };
+
+    const getHashForTab = (index: number) => {
+        const hashes = [
+            'dashboard',
+            'bot_builder',
+            'free_bots',
+            'analysis_tool',
+            'accumulators',
+            'chart',
+            'tutorial',
+            'copy_trading',
+            'risk_management',
+            'manual_trading',
+        ];
+        return hashes[index] || 'dashboard';
+    };
 
     return (
         <div className='nav-bar'>
@@ -82,7 +103,7 @@ const NavBar: React.FC<TNavBarProps> = ({ activeTab, onTabChange }) => {
                             className={classNames('nav-bar__tab', {
                                 'nav-bar__tab--active': activeTab === index,
                             })}
-                            onClick={() => onTabChange(index)}
+                            onClick={() => handleTabChange(index)}
                             type='button'
                         >
                             <IconComponent height='16px' width='16px' fill='currentColor' />
@@ -92,13 +113,13 @@ const NavBar: React.FC<TNavBarProps> = ({ activeTab, onTabChange }) => {
                         </button>
                     );
                 })}
-                {/* Manual Trading Tab - Route-based navigation */}
+                {/* Manual Trading Tab - Integrated into main tab system */}
                 <button
                     id='id-manual-trading'
                     className={classNames('nav-bar__tab', {
-                        'nav-bar__tab--active': isManualTradingPage,
+                        'nav-bar__tab--active': activeTab === 9,
                     })}
-                    onClick={() => navigate('/manual-trading')}
+                    onClick={() => handleTabChange(9)}
                     type='button'
                 >
                     <LegacyBuysellIcon height='16px' width='16px' fill='currentColor' />
