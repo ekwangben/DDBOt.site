@@ -13,6 +13,10 @@ export interface TradeParams {
     barrier?: number; // For high/low contracts
     barrier2?: number; // For range contracts
     selectedDigit?: number; // For digit contracts
+    limitOrder?: {
+        take_profit?: number;
+        stop_loss?: number;
+    };
 }
 
 export interface TradeResult {
@@ -98,6 +102,7 @@ export const useTradeExecution = () => {
                 ...(params.barrier && { barrier: params.barrier.toString() }),
                 ...(params.barrier2 && { barrier2: params.barrier2.toString() }),
                 ...(params.selectedDigit !== undefined && { barrier: params.selectedDigit.toString() }),
+                ...(params.limitOrder && { limit_order: params.limitOrder }),
             };
 
             const proposalResponse = await sendWithRetry(proposalRequest);

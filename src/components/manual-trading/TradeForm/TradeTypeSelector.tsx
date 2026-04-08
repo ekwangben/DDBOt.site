@@ -1,48 +1,41 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { localize } from '@deriv-com/translations';
 import './trade-type-selector.scss';
 
-// Trade type categories (matching DTrader)
-export type TradeCategory = 'rise-fall' | 'high-low' | 'digits' | 'turbo' | 'vanillas';
+export type TradeCategory = 'multipliers' | 'options' | 'accumulators' | 'turbos' | 'vanillas';
 
-// Contract types mapping
 export interface ContractTypeInfo {
     value: string;
     label: string;
     category: TradeCategory;
+    group: string;
     description: string;
 }
 
 export const CONTRACT_TYPES: ContractTypeInfo[] = [
-    // Rise & Fall
-    { value: 'CALL', label: localize('Rise'), category: 'rise-fall', description: localize('Starts higher than entry spot') },
-    { value: 'PUT', label: localize('Fall'), category: 'rise-fall', description: localize('Starts lower than entry spot') },
-    { value: 'CALL_EVEN', label: localize('Rise (Even)'), category: 'rise-fall', description: localize('Ends higher on even seconds') },
-    { value: 'PUT_EVEN', label: localize('Fall (Even)'), category: 'rise-fall', description: localize('Ends lower on even seconds') },
-    { value: 'CALL_ODD', label: localize('Rise (Odd)'), category: 'rise-fall', description: localize('Ends higher on odd seconds') },
-    { value: 'PUT_ODD', label: localize('Fall (Odd)'), category: 'rise-fall', description: localize('Ends lower on odd seconds') },
+    // Multipliers
+    { value: 'MULTUP', label: localize('Multipliers'), category: 'multipliers', group: localize('Multipliers'), description: localize('Multipliers') },
 
-    // High & Low
-    { value: 'ONETOUCH', label: localize('Touch'), category: 'high-low', description: localize('Touches barrier at any point') },
-    { value: 'NOTOUCH', label: localize('No Touch'), category: 'high-low', description: localize('Never touches barrier') },
-    { value: 'HIGH', label: localize('High'), category: 'high-low', description: localize('Ends higher than barrier') },
-    { value: 'LOW', label: localize('Low'), category: 'high-low', description: localize('Ends lower than barrier') },
+    // Accumulators
+    { value: 'ACCU', label: localize('Accumulators'), category: 'accumulators', group: localize('Accumulators'), description: localize('Accumulators') },
+
+    // Ups & Downs
+    { value: 'CALL', label: localize('Rise/Fall'), category: 'options', group: localize('Ups & Downs'), description: localize('Starts higher/lower than entry spot') },
+    { value: 'HIGH', label: localize('Higher/Lower'), category: 'options', group: localize('Ups & Downs'), description: localize('Ends higher/lower than barrier') },
+
+    // Touch & No Touch
+    { value: 'ONETOUCH', label: localize('Touch/No Touch'), category: 'options', group: localize('Touch & No Touch'), description: localize('Touches/Never touches barrier') },
 
     // Digits
-    { value: 'DIGITOVER', label: localize('Over'), category: 'digits', description: localize('Last digit is over selected digit') },
-    { value: 'DIGITUNDER', label: localize('Under'), category: 'digits', description: localize('Last digit is under selected digit') },
-    { value: 'DIGITMATCH', label: localize('Matches'), category: 'digits', description: localize('Last digit matches selected digit') },
-    { value: 'DIGITDIFF', label: localize('Differs'), category: 'digits', description: localize('Last digit differs from selected digit') },
-    { value: 'DIGITEVEN', label: localize('Even'), category: 'digits', description: localize('Last digit is even') },
-    { value: 'DIGITODD', label: localize('Odd'), category: 'digits', description: localize('Last digit is odd') },
+    { value: 'DIGITMATCH', label: localize('Matches/Differs'), category: 'options', group: localize('Digits'), description: localize('Last digit matches/differs from selected digit') },
+    { value: 'DIGITEVEN', label: localize('Even/Odd'), category: 'options', group: localize('Digits'), description: localize('Last digit is even/odd') },
+    { value: 'DIGITOVER', label: localize('Over/Under'), category: 'options', group: localize('Digits'), description: localize('Last digit is over/under selected digit') },
 
-    // Turbo
-    { value: 'CALL', label: localize('Rise (5 ticks)'), category: 'turbo', description: localize('5 tick rise/fall') },
-    { value: 'PUT', label: localize('Fall (5 ticks)'), category: 'turbo', description: localize('5 tick rise/fall') },
+    // Turbos
+    { value: 'TURBOS', label: localize('Turbos'), category: 'turbos', group: localize('Turbos'), description: localize('Turbos') },
 
     // Vanillas
-    { value: 'CALL', label: localize('Call'), category: 'vanillas', description: localize('Standard call option') },
-    { value: 'PUT', label: localize('Put'), category: 'vanillas', description: localize('Standard put option') },
+    { value: 'VANILLAS', label: localize('Vanillas'), category: 'vanillas', group: localize('Vanillas'), description: localize('Vanillas') },
 ];
 
 interface TradeTypeSelectorProps {
@@ -58,50 +51,104 @@ export const TradeTypeSelector: React.FC<TradeTypeSelectorProps> = ({
     onCategoryChange,
     onContractTypeChange,
 }) => {
-    const categories: { value: TradeCategory; label: string }[] = [
-        { value: 'rise-fall', label: localize('Up/Down') },
-        { value: 'high-low', label: localize('High/Low') },
-        { value: 'digits', label: localize('Digits') },
-        { value: 'turbo', label: localize('Turbo') },
-        { value: 'vanillas', label: localize('Vanillas') },
+    const [isOpen, setIsOpen] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [activeCategory, setActiveCategory] = useState<TradeCategory>(selectedCategory);
+
+    const categories: { value: TradeCategory; label: string; isNew?: boolean }[] = [
+        { value: 'options', label: localize('Options') },
+        { value: 'multipliers', label: localize('Multipliers') },
+        { value: 'accumulators', label: localize('Accumulators'), isNew: true },
+        { value: 'turbos', label: localize('Turbos'), isNew: true },
+        { value: 'vanillas', label: localize('Vanillas'), isNew: true },
     ];
 
-    const getContractTypesForCategory = (category: TradeCategory) => {
-        return CONTRACT_TYPES.filter(ct => ct.category === category);
-    };
+    const filteredContracts = CONTRACT_TYPES.filter(ct => {
+        const matchesSearch = ct.label.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesCategory = activeCategory === 'options' ? (ct.category === 'options') : (ct.category === activeCategory);
+        return matchesSearch && matchesCategory;
+    });
+
+    const groupedContracts = filteredContracts.reduce((acc, ct) => {
+        if (!acc[ct.group]) acc[ct.group] = [];
+        acc[ct.group].push(ct);
+        return acc;
+    }, {} as Record<string, ContractTypeInfo[]>);
+
+    const currentContract = CONTRACT_TYPES.find(ct => ct.value === selectedContractType) || CONTRACT_TYPES[0];
 
     return (
         <div className='trade-type-selector'>
-            {/* Category Tabs */}
-            <div className='trade-type-selector__categories'>
-                {categories.map(cat => (
-                    <button
-                        key={cat.value}
-                        className={`trade-type-selector__category-btn ${
-                            selectedCategory === cat.value ? 'active' : ''
-                        }`}
-                        onClick={() => onCategoryChange(cat.value)}
-                    >
-                        {cat.label}
-                    </button>
-                ))}
-            </div>
+            <button className='trade-type-selector__trigger' onClick={() => setIsOpen(true)}>
+                <span className='trade-type-selector__trigger-icon'>
+                    <svg width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2'><path d='M3 3v18h18'/><path d='m19 9-5 5-4-4-3 3'/></svg>
+                </span>
+                <span className='trade-type-selector__trigger-label'>{currentContract.label}</span>
+                <span className='chevron'>▼</span>
+            </button>
 
-            {/* Contract Type Buttons */}
-            <div className='trade-type-selector__contracts'>
-                {getContractTypesForCategory(selectedCategory).map(contract => (
-                    <button
-                        key={contract.value}
-                        className={`trade-type-selector__contract-btn ${
-                            selectedContractType === contract.value ? 'active' : ''
-                        }`}
-                        onClick={() => onContractTypeChange(contract.value)}
-                        title={contract.description}
-                    >
-                        {contract.label}
-                    </button>
-                ))}
-            </div>
+            {isOpen && (
+                <>
+                    <div className='trade-type-selector__overlay' onClick={() => setIsOpen(false)} />
+                    <div className='trade-type-selector__modal'>
+                        <div className='trade-type-selector__header'>
+                            <h3>{localize('Trade types')}</h3>
+                            <button className='close-btn' onClick={() => setIsOpen(false)}>×</button>
+                        </div>
+
+                        <div className='trade-type-selector__search'>
+                            <span className='search-icon'>🔍</span>
+                            <input
+                                type='text'
+                                placeholder={localize('Search')}
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                            />
+                        </div>
+
+                        <div className='trade-type-selector__body'>
+                            <div className='trade-type-selector__categories'>
+                                {categories.map(cat => (
+                                    <button
+                                        key={cat.value}
+                                        className={`trade-type-selector__category-btn ${activeCategory === cat.value ? 'active' : ''}`}
+                                        onClick={() => setActiveCategory(cat.value)}
+                                    >
+                                        <span>{cat.label}</span>
+                                        {cat.isNew && <span className='badge'>{localize('New!')}</span>}
+                                    </button>
+                                ))}
+                            </div>
+
+                            <div className='trade-type-selector__content'>
+                                {Object.entries(groupedContracts).map(([group, contracts]) => (
+                                    <div key={group} className='trade-type-selector__group'>
+                                        <h4>{group}</h4>
+                                        <div className='trade-type-selector__contracts-grid'>
+                                            {contracts.map(contract => (
+                                                <div
+                                                    key={contract.value}
+                                                    className={`trade-type-selector__contract-card ${selectedContractType === contract.value ? 'active' : ''}`}
+                                                    onClick={() => {
+                                                        onContractTypeChange(contract.value);
+                                                        onCategoryChange(contract.category);
+                                                        setIsOpen(false);
+                                                    }}
+                                                >
+                                                    <span className='icon'>
+                                                        <svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2'><path d='M3 3v18h18'/><path d='m19 9-5 5-4-4-3 3'/></svg>
+                                                    </span>
+                                                    <span className='name'>{contract.label}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </>
+            )}
         </div>
     );
 };
