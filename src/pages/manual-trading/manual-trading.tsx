@@ -4,6 +4,7 @@ import { DigitStatistics } from '@/components/manual-trading/DigitStatistics';
 import { TradeForm } from '@/components/manual-trading/TradeForm';
 import { PositionsPanel } from '@/components/manual-trading/PositionsPanel';
 import { MarketSelector } from '@/components/manual-trading/market/MarketSelector';
+import { AccountSelector } from '@/components/manual-trading/AccountSelector/AccountSelector';
 import chart_api from '@/external/bot-skeleton/services/api/chart-api';
 import { useStore } from '@/hooks/useStore';
 import {
@@ -21,7 +22,18 @@ const ManualTrading: React.FC = observer(() => {
     const [showFallback, setShowFallback] = useState(false);
     const [showPositions, setShowPositions] = useState(false);
     const [showStats, setShowStats] = useState(false);
+    const [isPanelOpen, setIsPanelOpen] = useState(window.innerWidth > 768);
     const chartSubscriptionIdRef = useRef<string | undefined>(undefined);
+
+    useEffect(() => {
+        const handleResize = () => {
+            if (window.innerWidth > 768) {
+                setIsPanelOpen(true);
+            }
+        };
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
     const subscriptionsRef = useRef<Record<string, any>>({});
 
     const chart_store = store?.chart_store;
@@ -227,7 +239,8 @@ const ManualTrading: React.FC = observer(() => {
                 </div>
 
                 {/* Trade Form Panel */}
-                <div className='manual-trading__trade-panel'>
+                <div className={`manual-trading__trade-panel ${!isPanelOpen ? 'manual-trading__trade-panel--closed' : ''}`}>
+                    <AccountSelector />
                     <div className='manual-trading__trade-panel-tabs'>
                         <button
                             className={`tab-btn ${!showPositions ? 'active' : ''}`}
@@ -251,6 +264,13 @@ const ManualTrading: React.FC = observer(() => {
                         </div>
                     )}
                 </div>
+
+                <button
+                    className='manual-trading__panel-toggle'
+                    onClick={() => setIsPanelOpen(!isPanelOpen)}
+                >
+                    {isPanelOpen ? '▼' : '▲'}
+                </button>
             </div>
 
             {/* Bottom Status Bar */}

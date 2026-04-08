@@ -15,6 +15,7 @@ export interface ProposalParams {
     barrier?: number | string;
     barrier2?: number | string;
     selectedDigit?: number;
+    multiplier?: number;
     limitOrder?: {
         take_profit?: number;
         stop_loss?: number;
@@ -82,6 +83,7 @@ export const useProposal = () => {
                 ...(params.barrier2 && { barrier2: params.barrier2.toString() }),
                 ...(params.selectedDigit !== undefined && { barrier: params.selectedDigit.toString() }),
                 ...(params.limitOrder && { limit_order: params.limitOrder }),
+                ...(params.multiplier && { multiplier: params.multiplier }),
             };
 
             const response = await api_base.api!.send(proposalRequest);
