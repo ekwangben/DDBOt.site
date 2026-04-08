@@ -3,16 +3,51 @@
 .manual-trading {
     width: 100%;
     height: 100%;
-    background: #f5f5f5;
+    background: #fff;
     display: flex;
     flex-direction: column;
     position: relative;
+    overflow: hidden;
 
     &__layout {
         display: flex;
         flex: 1;
         height: 100%;
         min-height: 0;
+        position: relative;
+    }
+
+    &__sidebar {
+        width: 48px;
+        background: #fff;
+        border-right: 1px solid #eee;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding-top: 8px;
+        z-index: 2;
+
+        &-item {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 8px;
+            cursor: pointer;
+            border-radius: 4px;
+            color: #666;
+
+            &:hover {
+                background: #f5f5f5;
+                color: #333;
+            }
+
+            &--active {
+                background: #f5f5f5;
+                color: #ff444f;
+            }
+        }
     }
 
     &__chart-section {
@@ -24,102 +59,187 @@
         flex-direction: column;
     }
 
-    &__trade-panel {
-        width: 380px;
-        min-width: 380px;
-        border-left: 1px solid #e0e0e0;
-        background: #fff;
-        overflow: hidden;
+    &__market-selector-wrapper {
+        position: absolute;
+        top: 16px;
+        left: 16px;
+        z-index: 10;
         display: flex;
-        flex-direction: column;
-    }
-
-    &__toggle-positions {
-        padding: 1rem;
-        border-bottom: 1px solid #f0f0f0;
-    }
-
-    &__positions-btn {
-        width: 100%;
-        padding: 1rem;
-        border: 1px solid #e0e0e0;
-        background: #f9f9f9;
-        border-radius: 6px;
-        font-size: 1.4rem;
-        font-weight: 600;
+        align-items: center;
+        background: #fff;
+        border: 1px solid #eee;
+        border-radius: 8px;
+        padding: 8px 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         cursor: pointer;
-        transition: all 0.2s;
-        color: #333;
+        min-width: 200px;
 
         &:hover {
-            background: #f0f0f0;
-            border-color: #00a79e;
+            border-color: #ddd;
+        }
+
+        .market-icon {
+            margin-right: 12px;
+            width: 24px;
+            height: 24px;
+        }
+
+        .market-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+
+            .market-name {
+                font-weight: 600;
+                font-size: 13px;
+                color: #333;
+            }
+
+            .market-price-change {
+                font-size: 11px;
+                display: flex;
+                align-items: center;
+                gap: 4px;
+                color: #999;
+
+                &.live {
+                    .price {
+                        color: #4bb4b3;
+                        font-weight: 600;
+                    }
+
+                    .indicator {
+                        font-size: 9px;
+                        color: #4bb4b3;
+                        animation: pulse 2s infinite;
+                    }
+                }
+            }
+        }
+
+        .chevron {
+            color: #999;
+            font-size: 12px;
         }
     }
 
-    &__loading {
+    &__trade-panel {
+        width: 320px;
+        min-width: 320px;
+        border-left: 1px solid #eee;
+        background: #fff;
         display: flex;
         flex-direction: column;
-        align-items: center;
-        justify-content: center;
+        z-index: 2;
+
+        &-tabs {
+            padding: 16px 16px 0 16px;
+            display: flex;
+            gap: 12px;
+
+            .tab-btn {
+                flex: 1;
+                padding: 8px;
+                border: none;
+                border-radius: 4px;
+                font-size: 12px;
+                cursor: pointer;
+                transition: all 0.2s;
+                background: none;
+                color: #666;
+
+                &.active {
+                    background: #eee;
+                    font-weight: 600;
+                    color: #333;
+                }
+            }
+        }
+    }
+
+    &__positions-container {
+        display: flex;
+        flex-direction: column;
         height: 100%;
-        gap: 1.5rem;
-
-        .spinner {
-            width: 48px;
-            height: 48px;
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #d90000;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        p {
-            font-size: 1.6rem;
-            color: #666;
-        }
+        overflow-y: auto;
     }
 
     &__chart-wrapper {
         flex: 1;
         width: 100%;
-        min-height: 400px;
         position: relative;
 
         .sc-chart {
             height: 100% !important;
             width: 100% !important;
-            min-height: 400px;
+        }
+    }
+
+    &__bottom-bar {
+        height: 40px;
+        background: #fff;
+        border-top: 1px solid #eee;
+        display: flex;
+        align-items: center;
+        padding: 0 16px;
+        font-size: 12px;
+        color: #666;
+        z-index: 3;
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4caf50;
+            margin-right: 8px;
         }
 
-        .sc-chart-container {
-            height: 100% !important;
-            width: 100% !important;
-        }
-
-        .sc-main-wrapper {
-            height: 100% !important;
-            width: 100% !important;
-        }
-
-        // Toolbar widget styling
-        .manual-trading__toolbar {
+        .timestamp {
+            margin-left: auto;
             display: flex;
-            gap: 0.5rem;
-            padding: 0.5rem;
-            background: rgb(255 255 255 / 90%);
-            border-radius: 4px;
-            box-shadow: 0 2px 8px rgb(0 0 0 / 10%);
+            align-items: center;
+            gap: 16px;
+        }
+
+        .icon-group {
+            display: flex;
+            gap: 12px;
+            margin-left: 16px;
+            align-items: center;
+
+            svg {
+                cursor: pointer;
+                &:hover { color: #333; }
+            }
         }
     }
-}
 
-@keyframes spin {
-    0% {
-        transform: rotate(0deg);
+    &__stats-toggle {
+        position: absolute;
+        bottom: 56px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 5;
+        background: #fff;
+        border: 1px solid #eee;
+        border-radius: 20px;
+        padding: 4px 16px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 500;
+
+        &:hover {
+            background: #f9f9f9;
+        }
     }
 
-    100% {
-        transform: rotate(360deg);
+    @keyframes pulse {
+        0% { opacity: 0.5; }
+        50% { opacity: 1; }
+        100% { opacity: 0.5; }
     }
 }
