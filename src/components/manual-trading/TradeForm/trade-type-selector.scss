@@ -1,4 +1,4 @@
-@import "../../shared/styles/constants";
+@use 'components/shared/styles/constants' as *;
 
 .trade-type-selector {
     position: relative;
@@ -199,40 +199,6 @@
         flex-direction: column;
         background: $color-grey-1;
         overflow: hidden;
-    }
-
-    &__banner {
-        padding: 16px;
-        background: #fff; // Matches design's white banner area
-        border-bottom: 1px solid $color-grey-2;
-
-        .banner-content {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: $color-grey-1;
-            padding: 12px 16px;
-            border-radius: 8px;
-        }
-
-        .banner-title {
-            font-size: 14px;
-            color: $color-black;
-        }
-
-        .banner-link {
-            background: none;
-            border: none;
-            color: $color-red;
-            font-weight: bold;
-            cursor: pointer;
-            font-size: 14px;
-            padding: 0;
-
-            &:hover {
-                text-decoration: underline;
-            }
-        }
     }
 
     &__scroll-area {
