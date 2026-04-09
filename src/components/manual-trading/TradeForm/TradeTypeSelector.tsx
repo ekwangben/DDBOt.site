@@ -7,7 +7,7 @@ export type TradeCategory = 'all' | 'multipliers' | 'options' | 'accumulators';
 export interface ContractTypeInfo {
     value: string;
     label: string;
-    category: TradeCategory | 'turbos' | 'vanillas';
+    category: TradeCategory;
     group: string;
     description: string;
     isNew?: boolean;
@@ -118,7 +118,7 @@ export const CONTRACT_TYPES: ContractTypeInfo[] = [
 interface TradeTypeSelectorProps {
     selectedCategory: TradeCategory;
     selectedContractType: string;
-    onCategoryChange: (category: any) => void;
+    onCategoryChange: (category: TradeCategory) => void;
     onContractTypeChange: (contractType: string) => void;
 }
 
@@ -145,7 +145,7 @@ export const TradeTypeSelector: React.FC<TradeTypeSelectorProps> = ({
 }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
-    const [activeCategory, setActiveCategory] = useState<TradeCategory>('all');
+    const [activeCategory, setActiveCategory] = useState<TradeCategory>(selectedCategory);
 
     const categories: { value: TradeCategory; label: string; isNew?: boolean }[] = [
         { value: 'all', label: localize('All') },
@@ -171,12 +171,7 @@ export const TradeTypeSelector: React.FC<TradeTypeSelectorProps> = ({
 
     const handleContractSelect = (contract: ContractTypeInfo) => {
         onContractTypeChange(contract.value);
-        // Map back to main categories for external state
-        let categoryToSet = contract.category;
-        if (categoryToSet === 'turbos' || categoryToSet === 'vanillas') {
-            categoryToSet = 'options';
-        }
-        onCategoryChange(categoryToSet);
+        onCategoryChange(contract.category);
         setIsOpen(false);
     };
 
@@ -227,14 +222,6 @@ export const TradeTypeSelector: React.FC<TradeTypeSelectorProps> = ({
                             </div>
 
                             <div className='trade-type-selector__main-content'>
-                                {activeCategory === 'all' && (
-                                    <div className='trade-type-selector__banner'>
-                                        <div className='banner-content'>
-                                            <span className='banner-title'>{localize('Looking for a specific trade type?')}</span>
-                                            <button className='banner-link'>{localize('Learn more')}</button>
-                                        </div>
-                                    </div>
-                                )}
                                 <div className='trade-type-selector__scroll-area'>
                                     {Object.entries(groupedContracts).map(([group, data]) => (
                                         <div key={group} className='trade-type-selector__group'>
@@ -249,11 +236,16 @@ export const TradeTypeSelector: React.FC<TradeTypeSelectorProps> = ({
                                                         className={`trade-type-selector__contract-card ${selectedContractType === contract.value ? 'active' : ''}`}
                                                         onClick={() => handleContractSelect(contract)}
                                                     >
-                                                        <div className='card-header'>
-                                                            <span className='card-name'>{contract.label}</span>
-                                                            <svg className='info-icon' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2' strokeLinecap='round' strokeLinejoin='round'><circle cx='12' cy='12' r='10'/><path d='M12 16v-4'/><path d='M12 8h.01'/></svg>
+                                                        <div className='card-icon'>
+                                                            {contract.icon}
                                                         </div>
-                                                        <span className='card-description'>{contract.description}</span>
+                                                        <div className='card-body'>
+                                                            <div className='card-header'>
+                                                                <span className='card-name'>{contract.label}</span>
+                                                                <svg className='info-icon' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='currentColor' strokeWidth='2' strokeLinecap='round' strokeLinejoin='round'><circle cx='12' cy='12' r='10'/><path d='M12 16v-4'/><path d='M12 8h.01'/></svg>
+                                                            </div>
+                                                            <span className='card-description'>{contract.description}</span>
+                                                        </div>
                                                     </div>
                                                 ))}
                                             </div>
