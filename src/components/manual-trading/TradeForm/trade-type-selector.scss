@@ -1,241 +1,35 @@
-@use 'components/shared/styles/constants' as *;
+@import "../../shared/styles/constants";
 
 .trade-type-selector {
-    padding: 16px;
-    border-bottom: 1px solid #eee;
+    position: relative;
+    width: 100%;
 
     &__trigger {
-        width: 100%;
-        display: flex;
-        align-items: center;
-        padding: 12px;
-        background: #fff;
-        border: 1px solid #eee;
-        border-radius: 4px;
-        cursor: pointer;
-        transition: all 0.2s;
-
-        &:hover {
-            border-color: #ccc;
-        }
-
-        &-icon {
-            margin-right: 12px;
-            color: #ff444f;
-        }
-
-        &-label {
-            flex: 1;
-            font-weight: 600;
-            font-size: 14px;
-            text-align: left;
-        }
-
-        .chevron {
-            color: #999;
-            font-size: 10px;
-        }
-    }
-
-    &__modal {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 600px;
-        height: 500px;
-        background: #fff;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-        z-index: 1000;
-        border-radius: 8px;
-        display: flex;
-        flex-direction: column;
-
-        @media (max-width: 768px) {
-            top: 0;
-            left: 0;
-            transform: none;
-            width: 100%;
-            height: 100%;
-            border-radius: 0;
-        }
-    }
-
-    &__header {
-        padding: 16px;
-        border-bottom: 1px solid #eee;
         display: flex;
         align-items: center;
         justify-content: space-between;
-
-        h3 {
-            margin: 0;
-            font-size: 16px;
-            font-weight: 600;
-        }
-
-        .close-btn {
-            background: none;
-            border: none;
-            font-size: 20px;
-            cursor: pointer;
-            color: #999;
-        }
-    }
-
-    &__search {
-        padding: 12px 16px;
-        position: relative;
-
-        input {
-            width: 100%;
-            padding: 8px 12px 8px 36px;
-            border: 1px solid #eee;
-            border-radius: 4px;
-            font-size: 14px;
-            outline: none;
-
-            &:focus {
-                border-color: #ff444f;
-            }
-        }
-
-        .search-icon {
-            position: absolute;
-            left: 28px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #999;
-        }
-    }
-
-    &__body {
-        flex: 1;
-        display: flex;
-        overflow: hidden;
-
-        @media (max-width: 768px) {
-            flex-direction: column;
-        }
-    }
-
-    &__categories {
-        width: 160px;
-        border-right: 1px solid #eee;
-        overflow-y: auto;
-        padding: 8px 0;
-
-        @media (max-width: 768px) {
-            width: 100%;
-            height: auto;
-            border-right: none;
-            border-bottom: 1px solid #eee;
-            display: flex;
-            overflow-x: auto;
-            padding: 0;
-        }
-    }
-
-    &__category-btn {
         width: 100%;
-        padding: 12px 16px;
-        text-align: left;
-        background: none;
-        border: none;
-        cursor: pointer;
-        font-size: 13px;
-        color: #666;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        white-space: nowrap;
-
-        @media (max-width: 768px) {
-            width: auto;
-            padding: 12px 20px;
-            border-bottom: 2px solid transparent;
-
-            &.active {
-                border-bottom: 2px solid #ff444f;
-                background: none;
-            }
-        }
-
-        &:hover {
-            background: #f9f9f9;
-        }
-
-        &.active {
-            background: #f5f5f5;
-            color: #333;
-            font-weight: 600;
-        }
-
-        .badge {
-            background: #ff444f;
-            color: #fff;
-            font-size: 9px;
-            padding: 2px 4px;
-            border-radius: 2px;
-            text-transform: uppercase;
-        }
-    }
-
-    &__content {
-        flex: 1;
-        overflow-y: auto;
-        padding: 16px;
-    }
-
-    &__group {
-        margin-bottom: 24px;
-
-        h4 {
-            font-size: 12px;
-            color: #999;
-            text-transform: uppercase;
-            margin: 0 0 12px 0;
-            letter-spacing: 0.5px;
-        }
-    }
-
-    &__contracts-grid {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 8px;
-
-        @media (max-width: 480px) {
-            grid-template-columns: 1fr;
-        }
-    }
-
-    &__contract-card {
-        padding: 12px;
-        border: 1px solid #eee;
+        padding: 8px 12px;
+        background: $color-white;
+        border: 1px solid $color-grey-2;
         border-radius: 4px;
-        display: flex;
-        align-items: center;
-        gap: 12px;
         cursor: pointer;
-        transition: all 0.2s;
+        height: 40px;
+
+        &-label {
+            font-size: 14px;
+            font-weight: bold;
+            color: $color-black;
+        }
+
+        .chevron {
+            color: $color-grey-3;
+            display: flex;
+            align-items: center;
+        }
 
         &:hover {
-            background: #f9f9f9;
-            border-color: #ddd;
-        }
-
-        &.active {
-            border-color: #ff444f;
-            background: #fff5f5;
-        }
-
-        .icon {
-            color: #ff444f;
-        }
-
-        .name {
-            font-size: 13px;
-            font-weight: 500;
+            border-color: $color-grey-3;
         }
     }
 
@@ -245,7 +39,311 @@
         left: 0;
         right: 0;
         bottom: 0;
-        background: rgba(0,0,0,0.3);
-        z-index: 999;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+    }
+
+    &__modal {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: $color-white;
+        width: 90%;
+        max-width: 800px;
+        height: 80vh;
+        max-height: 600px;
+        border-radius: 8px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        z-index: 1001;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    &__header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 16px;
+        border-bottom: 1px solid $color-grey-2;
+        background: $color-white;
+
+        .close-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: $color-grey-3;
+            display: flex;
+            align-items: center;
+            padding: 4px;
+
+            &:hover {
+                color: $color-black;
+            }
+        }
+    }
+
+    &__search {
+        display: flex;
+        align-items: center;
+        background: $color-grey-1;
+        border-radius: 4px;
+        padding: 4px 12px;
+        flex: 1;
+        margin-right: 16px;
+
+        .search-icon {
+            color: $color-black;
+            margin-right: 8px;
+        }
+
+        input {
+            border: none;
+            background: none;
+            outline: none;
+            width: 100%;
+            height: 32px;
+            font-size: 14px;
+            color: $color-black;
+
+            &::placeholder {
+                color: $color-grey-3;
+            }
+        }
+    }
+
+    &__body {
+        display: flex;
+        flex: 1;
+        overflow: hidden;
+    }
+
+    &__sidebar {
+        width: 200px;
+        border-right: 1px solid $color-grey-2;
+        background: $color-white;
+        overflow-y: auto;
+        padding: 8px 0;
+    }
+
+    &__category-btn {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 16px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        position: relative;
+        text-align: left;
+
+        .category-label-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: $color-black;
+
+            svg {
+                flex-shrink: 0;
+                color: $color-grey-3;
+            }
+        }
+
+        .category-label {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        &.active {
+            &::before {
+                content: '';
+                position: absolute;
+                left: 0;
+                top: 0;
+                bottom: 0;
+                width: 4px;
+                background: $color-red;
+            }
+
+            .category-label-wrapper {
+                color: $color-red;
+                svg {
+                    color: $color-red;
+                }
+            }
+            background: $color-grey-1;
+        }
+
+        &:hover:not(.active) {
+            background: $color-grey-1;
+            .category-label-wrapper {
+                color: $color-black;
+            }
+        }
+
+        .badge-new {
+            background: $color-red;
+            color: $color-white;
+            font-size: 10px;
+            font-weight: bold;
+            padding: 2px 4px;
+            border-radius: 2px;
+        }
+    }
+
+    &__main-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        background: $color-grey-1;
+        overflow: hidden;
+    }
+
+    &__banner {
+        padding: 16px;
+        background: #fff; // Matches design's white banner area
+        border-bottom: 1px solid $color-grey-2;
+
+        .banner-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: $color-grey-1;
+            padding: 12px 16px;
+            border-radius: 8px;
+        }
+
+        .banner-title {
+            font-size: 14px;
+            color: $color-black;
+        }
+
+        .banner-link {
+            background: none;
+            border: none;
+            color: $color-red;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 0;
+
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+    }
+
+    &__scroll-area {
+        flex: 1;
+        overflow-y: auto;
+        padding: 16px;
+    }
+
+    &__group {
+        margin-bottom: 24px;
+
+        .group-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            gap: 8px;
+        }
+
+        .group-title {
+            font-size: 12px;
+            font-weight: bold;
+            color: $color-grey-3;
+            text-transform: uppercase;
+        }
+
+        .badge-new-dot {
+            width: 8px;
+            height: 8px;
+            background: $color-red;
+            border-radius: 50%;
+        }
+    }
+
+    &__contracts-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 12px;
+    }
+
+    &__contract-card {
+        background: $color-white;
+        border: 1px solid $color-grey-2;
+        border-radius: 8px;
+        padding: 12px;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card-name {
+            font-size: 14px;
+            font-weight: bold;
+            color: $color-black;
+        }
+
+        .info-icon {
+            color: $color-grey-3;
+            flex-shrink: 0;
+        }
+
+        .card-description {
+            font-size: 12px;
+            color: $color-grey-3;
+            line-height: 1.4;
+        }
+
+        &:hover {
+            border-color: $color-red;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        &.active {
+            border-color: $color-red;
+            background: rgba($color-red, 0.05);
+        }
+    }
+}
+
+// Mobile responsiveness
+@media (max-width: 768px) {
+    .trade-type-selector {
+        &__modal {
+            width: 100%;
+            height: 100%;
+            max-height: none;
+            border-radius: 0;
+            top: 0;
+            left: 0;
+            transform: none;
+        }
+
+        &__sidebar {
+            width: 60px;
+            .category-label, .badge-new {
+                display: none;
+            }
+            .category-label-wrapper {
+                justify-content: center;
+                width: 100%;
+            }
+        }
+
+        &__contracts-grid {
+            grid-template-columns: 1fr;
+        }
     }
 }
