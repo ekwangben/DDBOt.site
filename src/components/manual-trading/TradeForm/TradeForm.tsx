@@ -10,9 +10,10 @@ import './trade-form.scss';
 
 interface TradeFormProps {
     currentSymbol?: string;
+    onContractTypeChange?: (contractType: string) => void;
 }
 
-export const TradeForm: React.FC<TradeFormProps> = observer(({ currentSymbol }) => {
+export const TradeForm: React.FC<TradeFormProps> = observer(({ currentSymbol, onContractTypeChange }) => {
     const store = useStore();
     const client = store?.client;
     const isLoggedIn = client?.is_logged_in;
@@ -28,6 +29,13 @@ export const TradeForm: React.FC<TradeFormProps> = observer(({ currentSymbol }) 
     const symbol = currentSymbol || 'R_100';
     const [tradeCategory, setTradeCategory] = useState<TradeCategory>('accumulators');
     const [contractType, setContractType] = useState<string>('ACCU');
+    
+    useEffect(() => {
+        if (onContractTypeChange) {
+            onContractTypeChange(contractType);
+        }
+    }, [contractType, onContractTypeChange]);
+
     const [stake, setStake] = useState<number>(10);
     const [growthRate, setGrowthRate] = useState<number>(0.03);
     const [multiplier] = useState<number>(100);

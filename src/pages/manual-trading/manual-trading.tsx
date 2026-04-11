@@ -58,6 +58,7 @@ const ManualTrading: React.FC = observer(() => {
     const [chartType, setChartType] = useState('line');
     const [showFallback, setShowFallback] = useState(false);
     const [showPositions, setShowPositions] = useState(false);
+    const [currentContractType, setCurrentContractType] = useState('ACCU');
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
     const [isPanelOpen, setIsPanelOpen] = useState(true);
     const chartSubscriptionIdRef = useRef<string | undefined>(undefined);
@@ -263,10 +264,12 @@ const ManualTrading: React.FC = observer(() => {
                         />
                     </div>
 
-                    {/* Digit Statistics Overlay (Always Visible) */}
-                    <div className='manual-trading__stats-container'>
-                        <DigitStatistics />
-                    </div>
+                    {/* Digit Statistics Overlay (Visible only for Over/Under) */}
+                    {['DIGITOVER', 'DIGITUNDER'].includes(currentContractType) && (
+                        <div className='manual-trading__stats-container'>
+                            <DigitStatistics />
+                        </div>
+                    )}
                 </div>
 
                 {/* Trade Form Panel */}
@@ -290,7 +293,10 @@ const ManualTrading: React.FC = observer(() => {
                     </div>
 
                     {!showPositions ? (
-                        <TradeForm currentSymbol={chartSymbol} />
+                        <TradeForm
+                            currentSymbol={chartSymbol}
+                            onContractTypeChange={setCurrentContractType}
+                        />
                     ) : (
                         <div className='manual-trading__positions-container'>
                             <PositionsPanel onBack={() => setShowPositions(false)} />
