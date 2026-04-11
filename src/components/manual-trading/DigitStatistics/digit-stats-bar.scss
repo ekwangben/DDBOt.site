@@ -1,0 +1,116 @@
+.digit-stats-bar {
+    display: flex;
+    align-items: center;
+    background: #f4f6f8;
+    border-radius: 8px;
+    padding: 6px 16px;
+    gap: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    font-family: 'IBM Plex Sans', sans-serif;
+    user-select: none;
+    width: fit-content;
+    margin: 0 auto;
+    border: 1px solid #e9ecef;
+    pointer-events: auto;
+
+    &__info {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    &__icon {
+        color: #999;
+        display: flex;
+        align-items: center;
+    }
+
+    &__label {
+        font-size: 13px;
+        font-weight: 700;
+        color: #333;
+        text-transform: capitalize;
+    }
+
+    &__separator {
+        width: 1px;
+        height: 20px;
+        background: #dee2e6;
+    }
+
+    &__values {
+        display: flex;
+        gap: 16px;
+        align-items: center;
+    }
+
+    &__value-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-width: 24px;
+        position: relative;
+    }
+
+    &__value {
+        font-size: 13px;
+        font-weight: 500;
+        color: #666;
+    }
+
+    &__indicator {
+        display: flex;
+        gap: 1px;
+        line-height: 0.5;
+        position: absolute;
+        bottom: -6px;
+        color: #333;
+        font-weight: 900;
+        letter-spacing: -1px;
+
+        span {
+            font-size: 14px;
+        }
+    }
+
+    &__expand {
+        color: #999;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        margin-left: 4px;
+        transition: transform 0.3s ease;
+
+        &:hover {
+            color: #333;
+        }
+
+        svg {
+            transition: transform 0.3s ease;
+        }
+
+        .digit-stats-bar__expand-icon--expanded {
+            transform: rotate(180deg);
+        }
+    }
+}
+
+// Mobile specific sizing
+@media (width <= 768px) {
+    .digit-stats-bar {
+        padding: 4px 10px;
+        gap: 8px;
+        
+        &__values {
+            gap: 10px;
+        }
+
+        &__label {
+            display: none; // Hide word "Stats" on tiny screens to save space
+        }
+
+        &__value {
+            font-size: 11px;
+        }
+    }
+}

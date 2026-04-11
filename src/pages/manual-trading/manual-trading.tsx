@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { AccountSelector } from '@/components/manual-trading/AccountSelector/AccountSelector';
 import { DigitStatistics } from '@/components/manual-trading/DigitStatistics';
+import { DigitStatsBar } from '@/components/manual-trading/DigitStatistics/DigitStatsBar';
 import { PositionsPanel } from '@/components/manual-trading/PositionsPanel';
 import { TradeForm } from '@/components/manual-trading/TradeForm';
 import chart_api from '@/external/bot-skeleton/services/api/chart-api';
@@ -59,6 +60,7 @@ const ManualTrading: React.FC = observer(() => {
     const [showFallback, setShowFallback] = useState(false);
     const [showPositions, setShowPositions] = useState(false);
     const [currentContractType, setCurrentContractType] = useState('ACCU');
+    const [showDetailedStats, setShowDetailedStats] = useState(false);
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
     const [isPanelOpen, setIsPanelOpen] = useState(true);
     const chartSubscriptionIdRef = useRef<string | undefined>(undefined);
@@ -226,7 +228,7 @@ const ManualTrading: React.FC = observer(() => {
                     <div className='dashboard__chart-wrapper manual-trading__chart-wrapper' dir='ltr'>
                         <SmartChart
                             id='dbot'
-                            showLastDigitStats={true}
+                            showLastDigitStats={false}
                             chartControlsWidgets={null}
                             enabledChartFooter={false}
                             portalNodeId='modal_root'
@@ -264,12 +266,25 @@ const ManualTrading: React.FC = observer(() => {
                         />
                     </div>
 
-                    {/* Digit Statistics Overlay (Visible only for Over/Under) */}
-                    {['DIGITOVER', 'DIGITUNDER'].includes(currentContractType) && (
-                        <div className='manual-trading__stats-container'>
-                            <DigitStatistics />
-                        </div>
-                    )}
+                    {/* Digit Statistics Overlay */}
+                    <div className='manual-trading__stats-container'>
+                        {/* 1. Circular Digits + Cursor: Strictly for Over/Under */}
+                        {['DIGITOVER', 'DIGITUNDER'].includes(currentContractType) && (
+                            <div className='manual-trading__stats-detailed'>
+                                <DigitStatistics />
+                            </div>
+                        )}
+
+                        {/* 2. Professional Pill Bar: Strictly for Accumulators */}
+                        {['ACCU'].includes(currentContractType) && (
+                            <DigitStatsBar 
+                                symbol={chartSymbol} 
+                                onToggle={() => setShowDetailedStats(!showDetailedStats)}
+                                isExpanded={showDetailedStats}
+                                hideToggle={true}
+                            />
+                        )}
+                    </div>
                 </div>
 
                 {/* Trade Form Panel */}
@@ -277,21 +292,7 @@ const ManualTrading: React.FC = observer(() => {
                     className={`manual-trading__trade-panel ${!isPanelOpen ? 'manual-trading__trade-panel--closed' : ''}`}
                 >
                     <AccountSelector />
-                    <div className='manual-trading__trade-panel-tabs'>
-                        <button
-                            className={`tab-btn ${!showPositions ? 'active' : ''}`}
-                            onClick={() => setShowPositions(false)}
-                        >
-                            Trade
-                        </button>
-                        <button
-                            className={`tab-btn ${showPositions ? 'active' : ''}`}
-                            onClick={() => setShowPositions(true)}
-                        >
-                            Positions
-                        </button>
-                    </div>
-
+                    
                     {!showPositions ? (
                         <TradeForm
                             currentSymbol={chartSymbol}

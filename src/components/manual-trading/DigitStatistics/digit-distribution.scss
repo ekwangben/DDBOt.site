@@ -1,0 +1,119 @@
+.digit-distribution {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(8px);
+    border-radius: 12px;
+    padding: 24px 16px 12px;
+    width: 100%;
+    max-width: 600px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    margin-bottom: 12px;
+
+    &__bars {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        height: 140px;
+        gap: 8px;
+        padding-bottom: 24px;
+        border-bottom: 1px solid #eee;
+    }
+
+    &__column {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        height: 100%;
+        position: relative;
+    }
+
+    &__percentage {
+        font-size: 11px;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 8px;
+        position: absolute;
+        top: -20px;
+    }
+
+    &__bar-container {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+    }
+
+    &__bar {
+        width: 80%;
+        max-width: 32px;
+        min-height: 4px;
+        border-radius: 4px 4px 0 0;
+        transition: height 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), background-color 0.3s ease;
+        position: relative;
+        display: flex;
+        justify-content: center;
+
+        &--high {
+            background: linear-gradient(to top, #4caf50, #81c784);
+        }
+
+        &--low {
+            background: linear-gradient(to top, #f44336, #e57373);
+        }
+    }
+
+    &__count {
+        display: none; // Keep it clean for now, percentages are better
+    }
+
+    &__digit {
+        position: absolute;
+        bottom: -28px;
+        font-size: 14px;
+        font-weight: 700;
+        color: #555;
+    }
+
+    &__average-line {
+        position: absolute;
+        left: 16px;
+        right: 16px;
+        border-top: 1px dashed #bbb;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    &__average-label {
+        position: absolute;
+        right: -10px;
+        top: -8px;
+        font-size: 10px;
+        color: #999;
+        font-weight: 600;
+    }
+}
+
+// Mobile adaptations
+@media (width <= 768px) {
+    .digit-distribution {
+        padding: 20px 10px 10px;
+        
+        &__bars {
+            height: 100px;
+            gap: 4px;
+        }
+
+        &__digit {
+            font-size: 12px;
+            bottom: -24px;
+        }
+
+        &__percentage {
+            font-size: 9px;
+            top: -16px;
+        }
+    }
+}
