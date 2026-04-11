@@ -11,10 +11,14 @@
         padding: 16px;
         flex: 1;
         overflow-y: auto;
+
+        @media (width <= 480px) {
+            padding: 12px;
+        }
     }
 
     &__section {
-        margin-bottom: 24px;
+        margin-bottom: 12px; // Much tighter spacing
     }
 
     &__label {
@@ -23,7 +27,7 @@
         gap: 8px;
         font-size: 14px;
         color: #333;
-        margin-bottom: 12px;
+        margin-bottom: 8px; // Reduced from 12px
         font-weight: 500;
 
         .info-icon {
@@ -382,6 +386,17 @@
 
         &:last-child {
             margin-bottom: 0;
+        }
+    }
+
+    &__footer {
+        padding: 16px;
+        border-top: 1px solid #f2f3f4;
+        background: #fff;
+        margin-top: 4px; // Even tighter
+
+        @media (width <= 480px) {
+            padding: 8px 12px 14px; // Tight top/bottom padding
         }
     }
 

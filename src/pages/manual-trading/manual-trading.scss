@@ -52,9 +52,8 @@
             flex: 1; // Take remaining space (60%)
             border-left: none;
             border-top: 1px solid #eee;
-            overflow-y: auto;
-            position: relative; // Not fixed anymore
-            bottom: 0;
+            overflow: hidden; // Disable scrolling here, let the inner content scroll
+            position: relative;
             z-index: 10;
 
             &--closed {
@@ -223,26 +222,25 @@
         }
     }
 
-    &__stats-toggle {
+    &__stats-container {
         position: absolute;
-        bottom: 56px;
-        left: 50%;
-        transform: translateX(-50%);
+        bottom: 40px; // Moved up from 10px
+        left: 0;
+        right: 0;
         z-index: 5;
-        background: #fff;
-        border: 1px solid #eee;
-        border-radius: 20px;
-        padding: 4px 16px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        box-shadow: 0 2px 10px rgb(0 0 0 / 10%);
-        cursor: pointer;
-        font-size: 12px;
-        font-weight: 500;
+        pointer-events: none;
 
-        &:hover {
-            background: #f9f9f9;
+        @media (width <= 768px) {
+            bottom: 30px; // Also moved up on mobile
+        }
+
+        .digit-statistics {
+            position: relative; // Override its absolute position
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(4px);
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            pointer-events: auto;
         }
     }
 

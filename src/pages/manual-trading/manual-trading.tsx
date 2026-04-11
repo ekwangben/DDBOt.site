@@ -58,7 +58,6 @@ const ManualTrading: React.FC = observer(() => {
     const [chartType, setChartType] = useState('line');
     const [showFallback, setShowFallback] = useState(false);
     const [showPositions, setShowPositions] = useState(false);
-    const [showStats, setShowStats] = useState(false);
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
     const [isPanelOpen, setIsPanelOpen] = useState(true);
     const chartSubscriptionIdRef = useRef<string | undefined>(undefined);
@@ -226,7 +225,7 @@ const ManualTrading: React.FC = observer(() => {
                     <div className='dashboard__chart-wrapper manual-trading__chart-wrapper' dir='ltr'>
                         <SmartChart
                             id='dbot'
-                            showLastDigitStats={false}
+                            showLastDigitStats={true}
                             chartControlsWidgets={null}
                             enabledChartFooter={false}
                             portalNodeId='modal_root'
@@ -264,27 +263,9 @@ const ManualTrading: React.FC = observer(() => {
                         />
                     </div>
 
-                    {/* Digit Statistics Overlay Toggle */}
-                    <div className='manual-trading__stats-toggle' onClick={() => setShowStats(!showStats)}>
-                        <span>ⓘ Stats</span>
-                        {showStats && (
-                            <div
-                                style={{
-                                    position: 'absolute',
-                                    bottom: '40px',
-                                    left: '50%',
-                                    transform: 'translateX(-50%)',
-                                    width: '600px',
-                                    background: '#fff',
-                                    border: '1px solid #eee',
-                                    borderRadius: '8px',
-                                    padding: '16px',
-                                    boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
-                                }}
-                            >
-                                <DigitStatistics />
-                            </div>
-                        )}
+                    {/* Digit Statistics Overlay (Always Visible) */}
+                    <div className='manual-trading__stats-container'>
+                        <DigitStatistics />
                     </div>
                 </div>
 

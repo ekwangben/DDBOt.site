@@ -43,21 +43,21 @@
     &__digit-selector {
         display: grid;
         grid-template-columns: repeat(5, 1fr);
-        gap: 8px;
+        gap: 4px; // Tighter gap
         background: #f8f9fa;
-        padding: 12px;
+        padding: 8px; // Reduced padding
         border-radius: 8px;
     }
 
     &__digit-btn {
-        aspect-ratio: 1.5;
+        aspect-ratio: 1.8; // Flatter buttons
         display: flex;
         align-items: center;
         justify-content: center;
         border: 1px solid transparent;
         background: #fff;
         border-radius: 4px;
-        font-size: 16px;
+        font-size: 14px; // Slightly smaller font
         font-weight: 700;
         color: #333;
         cursor: pointer;
