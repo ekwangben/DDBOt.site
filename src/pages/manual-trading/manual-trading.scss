@@ -33,6 +33,20 @@
         @media (width <= 768px) {
             height: 40%; // Chart takes 40% height on mobile
             flex: none;
+
+            &:has(.manual-trading__chart-wrapper--hidden) {
+                height: auto;
+                flex: 1;
+                min-height: 350px;
+            }
+        }
+
+        .manual-trading__chart-wrapper {
+            height: 100%;
+            
+            &--hidden {
+                display: none !important;
+            }
         }
     }
 
@@ -232,6 +246,17 @@
 
         @media (width <= 768px) {
             bottom: 30px; // Also moved up on mobile
+
+            .manual-trading__chart-wrapper--hidden ~ & {
+                position: relative;
+                bottom: 0;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: #f8f9fa; // Background when chart is hidden
+                pointer-events: auto;
+            }
         }
 
         .digit-statistics {

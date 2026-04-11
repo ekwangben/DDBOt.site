@@ -127,6 +127,11 @@ const ManualTrading: React.FC = observer(() => {
 
         return () => {
             isMounted = false;
+            // Clean up all message subscriptions
+            Object.values(subscriptionsRef.current).forEach(sub => {
+                if (sub?.unsubscribe) sub.unsubscribe();
+            });
+            subscriptionsRef.current = {};
             if (chart_api.api) {
                 chart_api.api.forgetAll('ticks');
             }
@@ -182,10 +187,20 @@ const ManualTrading: React.FC = observer(() => {
             setChartSubscriptionId(history?.subscription?.id);
             if (history) callback(history);
             if (req.subscribe === 1) {
+                // Forget previous message subscription
+                const prevSubId = history?.subscription?.id;
+                if (subscriptionsRef.current[prevSubId]) {
+                    subscriptionsRef.current[prevSubId].unsubscribe();
+                }
+
+                // Subscribe to message stream and filter by expected message types
                 subscriptionsRef.current[history?.subscription?.id] = chart_api.api
                     .onMessage()
                     ?.subscribe(({ data }: { data: any }) => {
-                        callback(data);
+                        // Only forward tick or ohlc messages to the chart
+                        if (data?.msg_type === 'tick' || data?.msg_type === 'ohlc' || data?.msg_type === 'candles') {
+                            callback(data);
+                        }
                     });
             }
         } catch (e: any) {
@@ -213,6 +228,8 @@ const ManualTrading: React.FC = observer(() => {
 
     const is_connection_opened = !!chart_api?.api;
 
+    const shouldHideChart = isMobile && ['DIGITOVER', 'DIGITUNDER'].includes(currentContractType);
+
     const handleSymbolChange = (newSymbol: string) => {
         setChartSymbol(newSymbol);
         if (onSymbolChange) {
@@ -225,7 +242,7 @@ const ManualTrading: React.FC = observer(() => {
             <div className='manual-trading__layout'>
                 {/* Chart Section */}
                 <div className='manual-trading__chart-section'>
-                    <div className='dashboard__chart-wrapper manual-trading__chart-wrapper' dir='ltr'>
+                    <div className={`dashboard__chart-wrapper manual-trading__chart-wrapper ${shouldHideChart ? 'manual-trading__chart-wrapper--hidden' : ''}`} dir='ltr'>
                         <SmartChart
                             id='dbot'
                             showLastDigitStats={false}
@@ -235,8 +252,8 @@ const ManualTrading: React.FC = observer(() => {
                             chartStatusListener={(v: boolean) => setChartStatus(!v)}
                             toolbarWidget={() => (
                                 <ToolbarWidgets
-                                    updateChartType={updateChartType || (() => {})}
-                                    updateGranularity={updateGranularity || (() => {})}
+                                    updateChartType={updateChartType || (() => { })}
+                                    updateGranularity={updateGranularity || (() => { })}
                                     position='top'
                                     isDesktop={true}
                                 />
@@ -246,7 +263,7 @@ const ManualTrading: React.FC = observer(() => {
                             enabledNavigationWidget={true}
                             granularity={granularity}
                             requestAPI={requestAPI}
-                            requestForget={() => {}}
+                            requestForget={() => { }}
                             requestForgetStream={requestForgetStream}
                             requestSubscribe={requestSubscribe}
                             settings={settings}
@@ -277,8 +294,8 @@ const ManualTrading: React.FC = observer(() => {
 
                         {/* 2. Professional Pill Bar: Strictly for Accumulators */}
                         {['ACCU'].includes(currentContractType) && (
-                            <DigitStatsBar 
-                                symbol={chartSymbol} 
+                            <DigitStatsBar
+                                symbol={chartSymbol}
                                 onToggle={() => setShowDetailedStats(!showDetailedStats)}
                                 isExpanded={showDetailedStats}
                                 hideToggle={true}
@@ -292,7 +309,7 @@ const ManualTrading: React.FC = observer(() => {
                     className={`manual-trading__trade-panel ${!isPanelOpen ? 'manual-trading__trade-panel--closed' : ''}`}
                 >
                     <AccountSelector />
-                    
+
                     {!showPositions ? (
                         <TradeForm
                             currentSymbol={chartSymbol}

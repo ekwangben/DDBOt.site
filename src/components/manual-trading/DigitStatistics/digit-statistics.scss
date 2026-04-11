@@ -115,6 +115,7 @@
 }
 
 @keyframes cursor-bounce {
+
     0%,
     100% {
         bottom: -8px;
@@ -122,5 +123,64 @@
 
     50% {
         bottom: -5px;
+    }
+}
+
+@media (width <=768px) {
+    .digit-statistics {
+        &__circle-wrapper {
+            max-width: 44px;
+        }
+
+        &__digit {
+            font-size: 1.3rem;
+        }
+
+        &__percentage {
+            font-size: 0.75rem;
+        }
+
+        &__circles {
+            gap: 0.4rem;
+        }
+    }
+}
+
+@media (width <=480px) {
+    .digit-statistics {
+        &__circle-wrapper {
+            max-width: 36px;
+        }
+
+        &__digit {
+            font-size: 1.1rem;
+        }
+
+        &__percentage {
+            font-size: 0.65rem;
+        }
+
+        &__circles {
+            gap: 0.3rem;
+        }
+
+        &__cursor {
+            border-left-width: 4px;
+            border-right-width: 4px;
+            border-bottom-width: 5px;
+            bottom: -6px;
+        }
+    }
+
+    @keyframes cursor-bounce {
+
+        0%,
+        100% {
+            bottom: -6px;
+        }
+
+        50% {
+            bottom: -4px;
+        }
     }
 }
