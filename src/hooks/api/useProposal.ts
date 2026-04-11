@@ -20,6 +20,7 @@ export interface ProposalParams {
         take_profit?: number;
         stop_loss?: number;
     };
+    growth_rate?: number;
 }
 
 export interface ProposalData {
@@ -31,6 +32,8 @@ export interface ProposalData {
     spotTime: number;
     startDate: string;
     expiryDate: string;
+    maxTicks?: number;
+    maxPayout?: number;
 }
 
 export interface ProposalState {
@@ -62,21 +65,23 @@ export const useProposal = () => {
         if (!api_base.api) {
             const error = 'API not initialized';
             setState(prev => ({ ...prev, error }));
-            throw new Error(error);
+            return null;
         }
 
         const requestId = ++requestCounterRef.current;
+        const isAccu = params.contractType === 'ACCU';
 
-        setState(prev => ({ ...prev, isLoading: true, error: null, proposal: null }));
+        setState(prev => ({ ...prev, isLoading: true, error: null }));
 
         try {
             const proposalRequest: any = {
                 proposal: 1,
                 amount: params.amount,
-                basis: 'stake',
                 contract_type: params.contractType,
                 currency: params.currency,
                 symbol: params.symbol,
+                // Basis should not be sent for Accumulators
+                ...(!isAccu && { basis: 'stake' }),
                 ...(params.duration && { duration: params.duration }),
                 ...(params.durationUnit && { duration_unit: params.durationUnit }),
                 ...(params.barrier && { barrier: params.barrier.toString() }),
@@ -84,7 +89,11 @@ export const useProposal = () => {
                 ...(params.selectedDigit !== undefined && { barrier: params.selectedDigit.toString() }),
                 ...(params.limitOrder && { limit_order: params.limitOrder }),
                 ...(params.multiplier && { multiplier: params.multiplier }),
+                ...(params.growth_rate && { growth_rate: params.growth_rate }),
             };
+
+            // Debug log to confirm parameters
+            console.log(`[useProposal] Requesting ${params.contractType} for ${params.symbol}:`, proposalRequest);
 
             const response = await api_base.api!.send(proposalRequest);
 
@@ -94,9 +103,13 @@ export const useProposal = () => {
             }
 
             if (response.error) {
+                console.error('[useProposal] Response Error:', response.error);
                 throw new Error(response.error.message || 'Proposal failed');
             }
 
+            console.log('[useProposal] Response Success:', response.proposal);
+
+            const limitatory = response.proposal.limitatory || {};
             const proposalData: ProposalData = {
                 id: response.proposal.id,
                 askPrice: response.proposal.ask_price,
@@ -106,6 +119,9 @@ export const useProposal = () => {
                 spotTime: response.proposal.spot_time,
                 startDate: response.proposal.date_start,
                 expiryDate: response.proposal.expiry_date,
+                // Accumulators specific data
+                maxTicks: limitatory.last_tick !== undefined ? limitatory.last_tick : limitatory.max_ticks,
+                maxPayout: limitatory.payout !== undefined ? limitatory.payout : limitatory.max_payout,
             };
 
             if (isMountedRef.current) {
@@ -132,7 +148,7 @@ export const useProposal = () => {
                 });
             }
 
-            throw error;
+            return null;
         }
     }, []);
 

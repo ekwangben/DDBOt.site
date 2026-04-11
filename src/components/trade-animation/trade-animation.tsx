@@ -232,7 +232,15 @@ const TradeAnimation = observer(({ className, should_show_overlay }: TTradeAnima
                     'animation--disabled': is_disabled,
                 })}
             >
-                {show_overlay && <ContractResultOverlay profit={Number(profit || 0)} />}
+                {show_overlay && (
+                    <ContractResultOverlay
+                        profit={Number(profit || 0)}
+                        buyPrice={summary_card.contract_info?.buy_price}
+                        exitPrice={summary_card.contract_info?.exit_tick}
+                        payout={summary_card.contract_info?.payout}
+                        onClose={() => summary_card.clear()}
+                    />
+                )}
                 <span className='animation__text'>
                     <ContractStageText contract_stage={contract_stage} />
                 </span>

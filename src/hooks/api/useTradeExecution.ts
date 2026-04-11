@@ -8,7 +8,7 @@ export interface TradeParams {
     currency: string;
     duration?: number;
     durationUnit?: string;
-    growthRate?: number; // For accumulator contracts
+    growth_rate?: number; // For accumulator contracts
     basis?: 'stake' | 'payout';
     barrier?: number; // For high/low contracts
     barrier2?: number; // For range contracts
@@ -92,13 +92,13 @@ export const useTradeExecution = () => {
             const proposalRequest: any = {
                 proposal: 1,
                 amount: params.amount,
-                basis: params.basis || 'stake',
+                ...(params.contractType !== 'ACCU' && { basis: params.basis || 'stake' }),
                 contract_type: params.contractType,
                 currency: params.currency,
                 symbol: params.symbol,
                 ...(params.duration && { duration: params.duration }),
                 ...(params.durationUnit && { duration_unit: params.durationUnit }),
-                ...(params.growthRate && { growth_rate: params.growthRate }),
+                ...(params.growth_rate && { growth_rate: params.growth_rate }),
                 ...(params.barrier && { barrier: params.barrier.toString() }),
                 ...(params.barrier2 && { barrier2: params.barrier2.toString() }),
                 ...(params.selectedDigit !== undefined && { barrier: params.selectedDigit.toString() }),

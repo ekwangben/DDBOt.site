@@ -1,0 +1,41 @@
+.risk-disclaimer {
+    background: #0e0e0e;
+    padding: 12px 24px;
+    border-top: 1px solid #1c1c1c;
+    width: 100%;
+
+    &__content {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+
+        p {
+            margin: 0;
+            font-size: 10px;
+            line-height: 1.4;
+            color: #6e6e6e;
+            text-align: center;
+            font-weight: 400;
+            letter-spacing: 0.2px;
+
+            &:first-child {
+                color: #8c8c8c;
+            }
+        }
+    }
+}
+
+// Ensure it looks good on mobile
+@media (width <= 768px) {
+    .risk-disclaimer {
+        padding: 8px 16px;
+
+        &__content {
+            p {
+                font-size: 9px;
+            }
+        }
+    }
+}

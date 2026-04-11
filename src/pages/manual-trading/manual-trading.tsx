@@ -59,12 +59,15 @@ const ManualTrading: React.FC = observer(() => {
     const [showFallback, setShowFallback] = useState(false);
     const [showPositions, setShowPositions] = useState(false);
     const [showStats, setShowStats] = useState(false);
-    const [isPanelOpen, setIsPanelOpen] = useState(window.innerWidth > 768);
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+    const [isPanelOpen, setIsPanelOpen] = useState(true);
     const chartSubscriptionIdRef = useRef<string | undefined>(undefined);
 
     useEffect(() => {
         const handleResize = () => {
-            if (window.innerWidth > 768) {
+            const mobile = window.innerWidth <= 768;
+            setIsMobile(mobile);
+            if (!mobile) {
                 setIsPanelOpen(true);
             }
         };
@@ -226,6 +229,7 @@ const ManualTrading: React.FC = observer(() => {
                             showLastDigitStats={false}
                             chartControlsWidgets={null}
                             enabledChartFooter={false}
+                            portalNodeId='modal_root'
                             chartStatusListener={(v: boolean) => setChartStatus(!v)}
                             toolbarWidget={() => (
                                 <ToolbarWidgets
@@ -236,7 +240,7 @@ const ManualTrading: React.FC = observer(() => {
                                 />
                             )}
                             chartType={chartType}
-                            isMobile={false}
+                            isMobile={isMobile}
                             enabledNavigationWidget={true}
                             granularity={granularity}
                             requestAPI={requestAPI}

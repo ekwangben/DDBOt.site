@@ -128,19 +128,21 @@ const NavBar: React.FC<TNavBarProps> = ({ activeTab, onTabChange }) => {
                     </span>
                 </button>
             </div>
-            <div className='nav-bar__actions'>
-                <button className='nav-bar__run-button' type='button'>
-                    <svg width='12' height='14' viewBox='0 0 12 14' fill='none'>
-                        <path d='M0 0L12 7L0 14V0Z' fill='currentColor' />
-                    </svg>
-                    <Localize i18n_default_text='Run' />
-                </button>
-                <div className='nav-bar__status'>
-                    <span className='nav-bar__status-text'>
-                        <Localize i18n_default_text='Bot is not running' />
-                    </span>
+            {activeTab === 1 && (
+                <div className='nav-bar__actions'>
+                    <button className='nav-bar__run-button' type='button'>
+                        <svg width='12' height='14' viewBox='0 0 12 14' fill='none'>
+                            <path d='M0 0L12 7L0 14V0Z' fill='currentColor' />
+                        </svg>
+                        <Localize i18n_default_text='Run' />
+                    </button>
+                    <div className='nav-bar__status'>
+                        <span className='nav-bar__status-text'>
+                            <Localize i18n_default_text='Bot is not running' />
+                        </span>
+                    </div>
                 </div>
-            </div>
+            )}
         </div>
     );
 };
