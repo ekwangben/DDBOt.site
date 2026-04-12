@@ -1,4 +1,4 @@
-import React, { useEffect,useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { localize } from '@deriv-com/translations';
 import './trade-type-selector.scss';
 
@@ -176,6 +176,38 @@ export const CONTRACT_TYPES: ContractTypeInfo[] = [
         category: 'options',
         group: localize('Ups & Downs'),
         description: localize('Higher/Lower'),
+        icon: (
+            <div className='dual-icons'>
+                <svg
+                    width='20'
+                    height='20'
+                    viewBox='0 0 24 24'
+                    fill='none'
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                >
+                    <path d='M4 16l6-10 4 6 6-8' stroke='#4CAF50' strokeWidth='2.5' />
+                </svg>
+                <svg
+                    width='20'
+                    height='20'
+                    viewBox='0 0 24 24'
+                    fill='none'
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                >
+                    <path d='M4 8l6 10 4-6 6 8' stroke='#FF4444' strokeWidth='2.5' />
+                </svg>
+            </div>
+        ),
+    },
+    // Highs & Lows
+    {
+        value: 'ONETOUCH',
+        label: localize('Touch/No Touch'),
+        category: 'options',
+        group: localize('Ups & Downs'), // Placed here for better visibility alongside Higher/Lower
+        description: localize('Touch/No Touch'),
         icon: (
             <div className='dual-icons'>
                 <svg
@@ -400,7 +432,10 @@ export const TradeTypeSelector: React.FC<TradeTypeSelectorProps> = ({
                     {localize('Learn about this trade type')}
                 </a>
             </div>
-            <button className='trade-type-selector__trigger' onClick={() => setIsOpen(true)}>
+            <button
+                className={`trade-type-selector__trigger${selectedContractType ? ' trade-type-selector__trigger--active' : ''}`}
+                onClick={() => setIsOpen(true)}
+            >
                 <div className='trade-type-selector__trigger-content'>
                     <svg
                         className='back-arrow'

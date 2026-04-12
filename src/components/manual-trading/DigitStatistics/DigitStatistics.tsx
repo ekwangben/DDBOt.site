@@ -1,4 +1,4 @@
-import React, { useCallback,useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { api_base } from '@/external/bot-skeleton';
 import './digit-statistics.scss';
 
@@ -7,7 +7,7 @@ interface DigitStat {
     percentage: number;
 }
 
-const CIRCLE_SIZE = 48;
+const CIRCLE_SIZE = 68;
 const STROKE_WIDTH = 3;
 const RADIUS = (CIRCLE_SIZE - STROKE_WIDTH) / 2;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;

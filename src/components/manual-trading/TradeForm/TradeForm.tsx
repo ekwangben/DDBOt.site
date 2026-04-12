@@ -5,7 +5,7 @@ import { useTradeExecution } from '@/hooks/api/useTradeExecution';
 import { useStore } from '@/hooks/useStore';
 import { localize } from '@deriv-com/translations';
 import { ContractParameters } from './ContractParameters';
-import { CONTRACT_TYPES,TradeCategory, TradeTypeSelector } from './TradeTypeSelector';
+import { CONTRACT_TYPES, TradeCategory, TradeTypeSelector } from './TradeTypeSelector';
 import './trade-form.scss';
 
 interface TradeFormProps {
@@ -29,7 +29,7 @@ export const TradeForm: React.FC<TradeFormProps> = observer(({ currentSymbol, on
     const symbol = currentSymbol || 'R_100';
     const [tradeCategory, setTradeCategory] = useState<TradeCategory>('accumulators');
     const [contractType, setContractType] = useState<string>('ACCU');
-    
+
     useEffect(() => {
         if (onContractTypeChange) {
             onContractTypeChange(contractType);
@@ -38,13 +38,15 @@ export const TradeForm: React.FC<TradeFormProps> = observer(({ currentSymbol, on
 
     const [stake, setStake] = useState<number>(10);
     const [growthRate, setGrowthRate] = useState<number>(0.03);
+    const [isGrowthRateOpen, setIsGrowthRateOpen] = useState<boolean>(false);
     const [multiplier] = useState<number>(100);
     const [takeProfit, setTakeProfit] = useState<boolean>(false);
     const [stopLoss, setStopLoss] = useState<boolean>(false);
     const [tpValue, setTpValue] = useState<string>('');
     const [slValue, setSlValue] = useState<string>('');
-    const [duration] = useState<number>(5);
-    const [durationUnit] = useState<string>('t');
+    const [durationTicks, setDurationTicks] = useState<number | ''>(5);
+    const [durationMinutes, setDurationMinutes] = useState<number | ''>(1);
+    const [durationUnit, setDurationUnit] = useState<string>('t');
     const [barrier, setBarrier] = useState<number>(0);
     const [barrier2, setBarrier2] = useState<number>(0);
     const [selectedDigit, setSelectedDigit] = useState<number>(5);
@@ -67,6 +69,8 @@ export const TradeForm: React.FC<TradeFormProps> = observer(({ currentSymbol, on
         'PUT',
         'VANILLA',
         'TURBO',
+        'ONETOUCH',
+        'NOTOUCH',
     ].includes(contractType);
 
     // Request proposal when parameters change
@@ -83,7 +87,7 @@ export const TradeForm: React.FC<TradeFormProps> = observer(({ currentSymbol, on
                     currency: selectedCurrency,
                     ...(contractType === 'ACCU' && { growth_rate: growthRate }),
                     ...(tradeCategory === 'options' && {
-                        duration,
+                        duration: durationUnit === 't' ? durationTicks : durationMinutes,
                         durationUnit,
                         barrier: ['HIGH', 'LOW', 'ONETOUCH', 'NOTOUCH'].includes(contractType) ? barrier : undefined,
                         selectedDigit: ['DIGITOVER', 'DIGITUNDER', 'DIGITMATCH', 'DIGITDIFF'].includes(contractType)
@@ -102,6 +106,7 @@ export const TradeForm: React.FC<TradeFormProps> = observer(({ currentSymbol, on
                         currency: selectedCurrency,
                         duration,
                         durationUnit,
+                        barrier: ['HIGH', 'LOW', 'ONETOUCH', 'NOTOUCH'].includes(secondaryType) ? barrier : undefined,
                         selectedDigit: ['DIGITOVER', 'DIGITUNDER', 'DIGITMATCH', 'DIGITDIFF'].includes(secondaryType)
                             ? selectedDigit
                             : undefined,
@@ -121,7 +126,8 @@ export const TradeForm: React.FC<TradeFormProps> = observer(({ currentSymbol, on
         selectedCurrency,
         growthRate,
         multiplier,
-        duration,
+        durationTicks,
+        durationMinutes,
         durationUnit,
         barrier,
         barrier2,
@@ -142,6 +148,8 @@ export const TradeForm: React.FC<TradeFormProps> = observer(({ currentSymbol, on
             PUT: 'CALL',
             MULTUP: 'MULTDOWN',
             MULTDOWN: 'MULTUP',
+            ONETOUCH: 'NOTOUCH',
+            NOTOUCH: 'ONETOUCH',
         };
         return mapping[primary] || primary;
     }
@@ -163,7 +171,7 @@ export const TradeForm: React.FC<TradeFormProps> = observer(({ currentSymbol, on
                     currency: selectedCurrency,
                     ...(typeToBuy === 'ACCU' && { growth_rate: growthRate }),
                     ...(tradeCategory === 'options' && {
-                        duration,
+                        duration: durationUnit === 't' ? durationTicks : durationMinutes,
                         durationUnit,
                         barrier: ['HIGH', 'LOW', 'ONETOUCH', 'NOTOUCH'].includes(typeToBuy) ? barrier : undefined,
                         selectedDigit: ['DIGITOVER', 'DIGITUNDER', 'DIGITMATCH', 'DIGITDIFF'].includes(typeToBuy)
@@ -182,7 +190,8 @@ export const TradeForm: React.FC<TradeFormProps> = observer(({ currentSymbol, on
             stake,
             selectedCurrency,
             growthRate,
-            duration,
+            durationTicks,
+            durationMinutes,
             durationUnit,
             barrier,
             selectedDigit,
@@ -224,6 +233,25 @@ export const TradeForm: React.FC<TradeFormProps> = observer(({ currentSymbol, on
                             {localize('Growth rate')}
                             <span className='info-icon'>i</span>
                         </label>
+                        <div
+                            className='trade-form__growth-rate-trigger'
+                            onClick={() => setIsGrowthRateOpen(!isGrowthRateOpen)}
+                        >
+                            <span className='growth-rate-value'>{(growthRate * 100).toFixed(0)}%</span>
+                            <svg
+                                className={`growth-rate-chevron ${isGrowthRateOpen ? 'growth-rate-chevron--open' : ''}`}
+                                width='14'
+                                height='14'
+                                viewBox='0 0 24 24'
+                                fill='none'
+                                stroke='currentColor'
+                                strokeWidth='2.5'
+                                strokeLinecap='round'
+                                strokeLinejoin='round'
+                            >
+                                <path d='m6 9 6 6 6-6' />
+                            </svg>
+                        </div>
                         <div className='trade-form__grid'>
                             {growthRates.map(rate => (
                                 <button
@@ -235,6 +263,22 @@ export const TradeForm: React.FC<TradeFormProps> = observer(({ currentSymbol, on
                                 </button>
                             ))}
                         </div>
+                        {isGrowthRateOpen && (
+                            <div className='trade-form__growth-rate-dropdown'>
+                                {growthRates.map(rate => (
+                                    <button
+                                        key={rate.value}
+                                        className={`trade-form__btn ${growthRate === rate.value ? 'trade-form__btn--active' : ''}`}
+                                        onClick={() => {
+                                            setGrowthRate(rate.value);
+                                            setIsGrowthRateOpen(false);
+                                        }}
+                                    >
+                                        {rate.label}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 )}
 
@@ -265,9 +309,16 @@ export const TradeForm: React.FC<TradeFormProps> = observer(({ currentSymbol, on
                             barrier={barrier}
                             barrier2={barrier2}
                             selectedDigit={selectedDigit}
+                            durationTicks={durationTicks}
+                            durationMinutes={durationMinutes}
+                            durationUnit={durationUnit}
                             onBarrierChange={setBarrier}
                             onBarrier2Change={setBarrier2}
                             onDigitChange={setSelectedDigit}
+                            onDurationTicksChange={setDurationTicks}
+                            onDurationMinutesChange={setDurationMinutes}
+                            onDurationUnitChange={setDurationUnit}
+                            hideMinutes={contractType === 'DIGITOVER' || contractType === 'DIGITUNDER'}
                         />
                     </div>
                 )}
@@ -393,62 +444,185 @@ export const TradeForm: React.FC<TradeFormProps> = observer(({ currentSymbol, on
                         </div>
                     </div>
                 )}
-
-                <div className='trade-form__risk'>
-                    <div className='risk-item'>
-                        <div className='risk-item__left'>
-                            <input
-                                type='checkbox'
-                                checked={takeProfit}
-                                onChange={e => setTakeProfit(e.target.checked)}
-                            />
-                            <span>{localize('Take profit')}</span>
-                        </div>
-                        <span className='info-icon'>i</span>
-                    </div>
-                    {takeProfit && (
-                        <div className='trade-form__input-wrapper' style={{ marginBottom: '12px' }}>
-                            <input
-                                type='text'
-                                placeholder='Amount'
-                                value={tpValue}
-                                onChange={e => setTpValue(e.target.value)}
-                            />
-                        </div>
-                    )}
-
-                    <div className='risk-item'>
-                        <div className='risk-item__left'>
-                            <input type='checkbox' checked={stopLoss} onChange={e => setStopLoss(e.target.checked)} />
-                            <span>{localize('Stop loss')}</span>
-                        </div>
-                        <span className='info-icon'>i</span>
-                    </div>
-                    {stopLoss && (
-                        <div className='trade-form__input-wrapper' style={{ marginBottom: '12px' }}>
-                            <input
-                                type='text'
-                                placeholder='Amount'
-                                value={slValue}
-                                onChange={e => setSlValue(e.target.value)}
-                            />
-                        </div>
-                    )}
-
-                    {tradeCategory === 'multipliers' && (
-                        <div className='risk-item'>
-                            <div className='risk-item__left'>
-                                <input
-                                    type='checkbox'
-                                    checked={dealCancellation}
-                                    onChange={e => setDealCancellation(e.target.checked)}
-                                />
-                                <span>{localize('Deal cancellation')}</span>
+                {contractType !== 'ONETOUCH' &&
+                    contractType !== 'NOTOUCH' &&
+                    contractType !== 'DIGITOVER' &&
+                    contractType !== 'DIGITUNDER' && (
+                        <div className='trade-form__risk'>
+                            <div className='risk-item'>
+                                <div className='risk-item__left'>
+                                    <div
+                                        className={`custom-checkbox ${takeProfit ? 'custom-checkbox--checked' : ''}`}
+                                        onClick={() => setTakeProfit(!takeProfit)}
+                                    >
+                                        <svg
+                                            viewBox='0 0 24 24'
+                                            fill='none'
+                                            strokeWidth='3'
+                                            strokeLinecap='round'
+                                            strokeLinejoin='round'
+                                        >
+                                            <polyline points='20 6 9 17 4 12'></polyline>
+                                        </svg>
+                                    </div>
+                                    <span onClick={() => setTakeProfit(!takeProfit)}>{localize('Take profit')}</span>
+                                </div>
+                                <span className='info-icon'>i</span>
                             </div>
-                            <span className='info-icon'>i</span>
+                            {takeProfit && (
+                                <div className='trade-form__input-wrapper' style={{ marginBottom: '12px' }}>
+                                    <div className='tp-sl-input'>
+                                        <button
+                                            className='input-btn'
+                                            onClick={() =>
+                                                setTpValue(prev => {
+                                                    const num = parseFloat(prev) || 0;
+                                                    return Math.max(0, num - 1).toString();
+                                                })
+                                            }
+                                        >
+                                            <svg
+                                                width='14'
+                                                height='14'
+                                                viewBox='0 0 24 24'
+                                                fill='none'
+                                                stroke='currentColor'
+                                                strokeWidth='2'
+                                            >
+                                                <path d='M5 12h14' />
+                                            </svg>
+                                        </button>
+                                        <input
+                                            type='text'
+                                            placeholder='Amount'
+                                            value={tpValue}
+                                            onChange={e => setTpValue(e.target.value)}
+                                        />
+                                        <button
+                                            className='input-btn'
+                                            onClick={() =>
+                                                setTpValue(prev => {
+                                                    const num = parseFloat(prev) || 0;
+                                                    return (num + 1).toString();
+                                                })
+                                            }
+                                        >
+                                            <svg
+                                                width='14'
+                                                height='14'
+                                                viewBox='0 0 24 24'
+                                                fill='none'
+                                                stroke='currentColor'
+                                                strokeWidth='2'
+                                            >
+                                                <path d='M12 5v14M5 12h14' />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+
+                            {tradeCategory !== 'accumulators' && (
+                                <div className='risk-item'>
+                                    <div className='risk-item__left'>
+                                        <div
+                                            className={`custom-checkbox ${stopLoss ? 'custom-checkbox--checked' : ''}`}
+                                            onClick={() => setStopLoss(!stopLoss)}
+                                        >
+                                            <svg
+                                                viewBox='0 0 24 24'
+                                                fill='none'
+                                                strokeWidth='3'
+                                                strokeLinecap='round'
+                                                strokeLinejoin='round'
+                                            >
+                                                <polyline points='20 6 9 17 4 12'></polyline>
+                                            </svg>
+                                        </div>
+                                        <span onClick={() => setStopLoss(!stopLoss)}>{localize('Stop loss')}</span>
+                                    </div>
+                                    <span className='info-icon'>i</span>
+                                </div>
+                            )}
+                            {stopLoss && tradeCategory !== 'accumulators' && (
+                                <div className='trade-form__input-wrapper' style={{ marginBottom: '12px' }}>
+                                    <div className='tp-sl-input'>
+                                        <button
+                                            className='input-btn'
+                                            onClick={() =>
+                                                setSlValue(prev => {
+                                                    const num = parseFloat(prev) || 0;
+                                                    return Math.max(0, num - 1).toString();
+                                                })
+                                            }
+                                        >
+                                            <svg
+                                                width='14'
+                                                height='14'
+                                                viewBox='0 0 24 24'
+                                                fill='none'
+                                                stroke='currentColor'
+                                                strokeWidth='2'
+                                            >
+                                                <path d='M5 12h14' />
+                                            </svg>
+                                        </button>
+                                        <input
+                                            type='text'
+                                            placeholder='Amount'
+                                            value={slValue}
+                                            onChange={e => setSlValue(e.target.value)}
+                                        />
+                                        <button
+                                            className='input-btn'
+                                            onClick={() =>
+                                                setSlValue(prev => {
+                                                    const num = parseFloat(prev) || 0;
+                                                    return (num + 1).toString();
+                                                })
+                                            }
+                                        >
+                                            <svg
+                                                width='14'
+                                                height='14'
+                                                viewBox='0 0 24 24'
+                                                fill='none'
+                                                stroke='currentColor'
+                                                strokeWidth='2'
+                                            >
+                                                <path d='M12 5v14M5 12h14' />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+
+                            {tradeCategory === 'multipliers' && (
+                                <div className='risk-item'>
+                                    <div className='risk-item__left'>
+                                        <div
+                                            className={`custom-checkbox ${dealCancellation ? 'custom-checkbox--checked' : ''}`}
+                                            onClick={() => setDealCancellation(!dealCancellation)}
+                                        >
+                                            <svg
+                                                viewBox='0 0 24 24'
+                                                fill='none'
+                                                strokeWidth='3'
+                                                strokeLinecap='round'
+                                                strokeLinejoin='round'
+                                            >
+                                                <polyline points='20 6 9 17 4 12'></polyline>
+                                            </svg>
+                                        </div>
+                                        <span onClick={() => setDealCancellation(!dealCancellation)}>
+                                            {localize('Deal cancellation')}
+                                        </span>
+                                    </div>
+                                    <span className='info-icon'>i</span>
+                                </div>
+                            )}
                         </div>
                     )}
-                </div>
 
                 <div className='trade-form__summary'>
                     {proposalError && (
@@ -491,102 +665,108 @@ export const TradeForm: React.FC<TradeFormProps> = observer(({ currentSymbol, on
                         </div>
                     )}
                 </div>
-            </div>
 
-            <div className='trade-form__footer'>
-                {needsDualButtons ? (
-                    <div className='trade-form__dual-buttons'>
-                        <button
-                            className='trade-form__buy-btn up'
-                            onClick={() =>
-                                handleBuy(
-                                    contractType.includes('UNDER') ||
-                                        contractType.includes('DIFF') ||
-                                        contractType.includes('ODD')
-                                        ? getSecondaryType(contractType)
-                                        : contractType
-                                )
-                            }
-                            disabled={isBuying || !isLoggedIn}
-                        >
-                            <div className='btn-content'>
-                                <svg width='18' height='18' viewBox='0 0 24 24' fill='#fff'>
-                                    <path d='M12 4l-8 12h16l-8-12z' />
-                                </svg>
-                                <span className='label'>
-                                    {contractType.includes('MATCH')
-                                        ? localize('Matches')
-                                        : contractType.includes('EVEN')
-                                          ? localize('Even')
-                                          : contractType.includes('OVER')
-                                            ? localize('Over')
-                                            : contractType.includes('HIGHER')
-                                              ? localize('Higher')
-                                              : contractType === 'CALL'
-                                                ? localize('Rise')
-                                                : contractType === 'VANILLA'
-                                                  ? localize('Call')
-                                                  : contractType === 'TURBO'
-                                                    ? localize('Turbo Up')
-                                                    : localize('Up')}
-                                </span>
-                                <span className='payout'>
-                                    {proposal?.payout.toFixed(2) || '10.00'} {selectedCurrency}
-                                </span>
-                            </div>
-                        </button>
-                        <button
-                            className='trade-form__buy-btn down'
-                            onClick={() =>
-                                handleBuy(
-                                    contractType.includes('OVER') ||
-                                        contractType.includes('MATCH') ||
-                                        contractType.includes('EVEN')
-                                        ? getSecondaryType(contractType)
-                                        : contractType
-                                )
-                            }
-                            disabled={isBuying || !isLoggedIn}
-                        >
-                            <div className='btn-content'>
-                                <svg width='18' height='18' viewBox='0 0 24 24' fill='#fff'>
-                                    <path d='M12 20l8-12h-16l8 12z' />
-                                </svg>
-                                <span className='label'>
-                                    {contractType.includes('DIFF')
-                                        ? localize('Differs')
-                                        : contractType.includes('ODD')
-                                          ? localize('Odd')
-                                          : contractType.includes('UNDER')
-                                            ? localize('Under')
-                                            : contractType.includes('LOWER')
-                                              ? localize('Lower')
-                                              : contractType === 'PUT'
-                                                ? localize('Fall')
-                                                : contractType === 'VANILLA'
-                                                  ? localize('Put')
-                                                  : contractType === 'TURBO'
-                                                    ? localize('Turbo Down')
-                                                    : localize('Down')}
-                                </span>
-                                <span className='payout'>
-                                    {secondaryProposal?.payout.toFixed(2) || '10.00'} {selectedCurrency}
-                                </span>
-                            </div>
-                        </button>
-                    </div>
-                ) : (
-                    <button
-                        className='trade-form__buy-btn single'
-                        onClick={() => handleBuy(contractType)}
-                        disabled={isBuying || !isLoggedIn}
-                    >
-                        <div className='btn-content'>
-                            {currentContract?.icon}
-                            <span>{isBuying ? localize('Processing...') : localize('Buy')}</span>
+                <div className='trade-form__buttons'>
+                    {needsDualButtons ? (
+                        <div className='trade-form__dual-buttons'>
+                            <button
+                                className='trade-form__buy-btn up'
+                                onClick={() =>
+                                    handleBuy(
+                                        contractType.includes('UNDER') ||
+                                            contractType.includes('DIFF') ||
+                                            contractType.includes('ODD') ||
+                                            contractType === 'NOTOUCH'
+                                            ? getSecondaryType(contractType)
+                                            : contractType
+                                    )
+                                }
+                                disabled={isBuying || !isLoggedIn}
+                            >
+                                <div className='btn-content'>
+                                    <svg width='18' height='18' viewBox='0 0 24 24' fill='#fff'>
+                                        <path d='M12 4l-8 12h16l-8-12z' />
+                                    </svg>
+                                    <span className='label'>
+                                        {contractType.includes('MATCH')
+                                            ? localize('Matches')
+                                            : contractType.includes('EVEN')
+                                              ? localize('Even')
+                                              : contractType.includes('OVER')
+                                                ? localize('Over')
+                                                : contractType.includes('HIGHER')
+                                                  ? localize('Higher')
+                                                  : contractType.includes('TOUCH')
+                                                    ? localize('Touch')
+                                                    : contractType === 'CALL'
+                                                      ? localize('Rise')
+                                                      : contractType === 'VANILLA'
+                                                        ? localize('Call')
+                                                        : contractType === 'TURBO'
+                                                          ? localize('Turbo Up')
+                                                          : localize('Up')}
+                                    </span>
+                                    <span className='payout'>
+                                        {proposal?.payout.toFixed(2) || '10.00'} {selectedCurrency}
+                                    </span>
+                                </div>
+                            </button>
+                            <button
+                                className='trade-form__buy-btn down'
+                                onClick={() =>
+                                    handleBuy(
+                                        contractType.includes('OVER') ||
+                                            contractType.includes('MATCH') ||
+                                            contractType.includes('EVEN') ||
+                                            contractType === 'ONETOUCH'
+                                            ? getSecondaryType(contractType)
+                                            : contractType
+                                    )
+                                }
+                                disabled={isBuying || !isLoggedIn}
+                            >
+                                <div className='btn-content'>
+                                    <svg width='18' height='18' viewBox='0 0 24 24' fill='#fff'>
+                                        <path d='M12 20l8-12h-16l8 12z' />
+                                    </svg>
+                                    <span className='label'>
+                                        {contractType.includes('DIFF')
+                                            ? localize('Differs')
+                                            : contractType.includes('ODD')
+                                              ? localize('Odd')
+                                              : contractType.includes('UNDER')
+                                                ? localize('Under')
+                                                : contractType.includes('LOWER')
+                                                  ? localize('Lower')
+                                                  : contractType.includes('TOUCH')
+                                                    ? localize('No Touch')
+                                                    : contractType === 'PUT'
+                                                      ? localize('Fall')
+                                                      : contractType === 'VANILLA'
+                                                        ? localize('Put')
+                                                        : contractType === 'TURBO'
+                                                          ? localize('Turbo Down')
+                                                          : localize('Down')}
+                                    </span>
+                                    <span className='payout'>
+                                        {secondaryProposal?.payout.toFixed(2) || '10.00'} {selectedCurrency}
+                                    </span>
+                                </div>
+                            </button>
                         </div>
-                    </button>
-                )}
+                    ) : (
+                        <button
+                            className='trade-form__buy-btn single'
+                            onClick={() => handleBuy(contractType)}
+                            disabled={isBuying || !isLoggedIn}
+                        >
+                            <div className='btn-content'>
+                                {currentContract?.icon}
+                                <span>{isBuying ? localize('Processing...') : localize('Buy')}</span>
+                            </div>
+                        </button>
+                    )}
+                </div>
             </div>
         </div>
     );

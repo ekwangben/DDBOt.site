@@ -69,7 +69,6 @@ export const useProposal = () => {
         }
 
         const requestId = ++requestCounterRef.current;
-        const isAccu = params.contractType === 'ACCU';
 
         setState(prev => ({ ...prev, isLoading: true, error: null }));
 
@@ -80,8 +79,7 @@ export const useProposal = () => {
                 contract_type: params.contractType,
                 currency: params.currency,
                 symbol: params.symbol,
-                // Basis should not be sent for Accumulators
-                ...(!isAccu && { basis: 'stake' }),
+                basis: 'stake', // Deriv API always needs to know if amount refers to stake or payout, even for ACCU
                 ...(params.duration && { duration: params.duration }),
                 ...(params.durationUnit && { duration_unit: params.durationUnit }),
                 ...(params.barrier && { barrier: params.barrier.toString() }),
@@ -96,6 +94,7 @@ export const useProposal = () => {
             console.log(`[useProposal] Requesting ${params.contractType} for ${params.symbol}:`, proposalRequest);
 
             const response = await api_base.api!.send(proposalRequest);
+            console.log(`[useProposal] send() Promise resolved!`, response);
 
             // Check if this is still the latest request
             if (requestId !== requestCounterRef.current) {
@@ -109,7 +108,12 @@ export const useProposal = () => {
 
             console.log('[useProposal] Response Success:', response.proposal);
 
+            const contractDetails = response.proposal.contract_details || {};
+            const limitOrder = response.proposal.limit_order || {};
+            const takeProfit = limitOrder.take_profit || {};
             const limitatory = response.proposal.limitatory || {};
+            const validationParams = response.proposal.validation_params || {};
+
             const proposalData: ProposalData = {
                 id: response.proposal.id,
                 askPrice: response.proposal.ask_price,
@@ -119,9 +123,20 @@ export const useProposal = () => {
                 spotTime: response.proposal.spot_time,
                 startDate: response.proposal.date_start,
                 expiryDate: response.proposal.expiry_date,
-                // Accumulators specific data
-                maxTicks: limitatory.last_tick !== undefined ? limitatory.last_tick : limitatory.max_ticks,
-                maxPayout: limitatory.payout !== undefined ? limitatory.payout : limitatory.max_payout,
+                // Accumulators often return these directly or in contract_details/validation_params
+                maxTicks:
+                    response.proposal.max_ticks ??
+                    contractDetails.max_ticks ??
+                    validationParams.max_ticks ??
+                    limitOrder.max_ticks ??
+                    (limitatory.last_tick !== undefined ? limitatory.last_tick : limitatory.max_ticks),
+                maxPayout:
+                    response.proposal.max_payout ??
+                    contractDetails.max_payout ??
+                    validationParams.max_payout ??
+                    limitOrder.max_payout ??
+                    takeProfit.order_amount ??
+                    (limitatory.payout !== undefined ? limitatory.payout : limitatory.max_payout),
             };
 
             if (isMountedRef.current) {
@@ -134,12 +149,19 @@ export const useProposal = () => {
 
             return proposalData;
         } catch (error: any) {
+            // Check if this is still the latest request
             if (requestId !== requestCounterRef.current) {
                 return null;
             }
 
-            const errorMessage = error?.message || error?.code || 'Failed to get proposal';
-
+            let errorMessage = 'Failed to get proposal';
+            if (error?.error?.message) {
+                errorMessage = error.error.message;
+            } else if (error?.message) {
+                errorMessage = error.message;
+            } else if (error?.code) {
+                errorMessage = error.code;
+            }
             if (isMountedRef.current) {
                 setState({
                     isLoading: false,
