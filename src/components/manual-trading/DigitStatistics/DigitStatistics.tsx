@@ -12,7 +12,11 @@ const STROKE_WIDTH = 3;
 const RADIUS = (CIRCLE_SIZE - STROKE_WIDTH) / 2;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
-export const DigitStatistics: React.FC = () => {
+interface DigitStatisticsProps {
+    selectedDigit?: number;
+}
+
+export const DigitStatistics: React.FC<DigitStatisticsProps> = ({ selectedDigit }) => {
     const [digitStats, setDigitStats] = useState<DigitStat[]>(
         Array.from({ length: 10 }, (_, i) => ({ digit: i, percentage: 0 }))
     );
@@ -141,10 +145,14 @@ export const DigitStatistics: React.FC = () => {
                     const strokeDashoffset = CIRCUMFERENCE - (stat.percentage / 100) * CIRCUMFERENCE;
                     const strokeColor = getStrokeColor(stat.percentage);
                     const isCurrentDigit = stat.digit === currentDigit;
+                    const isSelectedDigit = selectedDigit !== undefined && stat.digit === selectedDigit;
 
                     return (
-                        <div key={stat.digit} className='digit-statistics__circle-wrapper'>
-                            <div className='digit-statistics__circle'>
+                        <div
+                            key={stat.digit}
+                            className={`digit-statistics__circle-wrapper${isSelectedDigit ? ' digit-statistics__circle-wrapper--selected' : ''}`}
+                        >
+                            <div className={`digit-statistics__circle${isSelectedDigit ? ' digit-statistics__circle--selected' : ''}`}>
                                 <svg
                                     className='digit-statistics__svg'
                                     width={CIRCLE_SIZE}
@@ -157,7 +165,7 @@ export const DigitStatistics: React.FC = () => {
                                         cy={CIRCLE_SIZE / 2}
                                         r={RADIUS}
                                         fill='none'
-                                        stroke='#f0f0f0'
+                                        stroke={isSelectedDigit ? 'rgba(255,255,255,0.2)' : '#f0f0f0'}
                                         strokeWidth={STROKE_WIDTH}
                                     />
                                     <circle
@@ -166,7 +174,7 @@ export const DigitStatistics: React.FC = () => {
                                         cy={CIRCLE_SIZE / 2}
                                         r={RADIUS}
                                         fill='none'
-                                        stroke={strokeColor}
+                                        stroke={isSelectedDigit ? 'rgba(255,255,255,0.6)' : strokeColor}
                                         strokeWidth={STROKE_WIDTH}
                                         strokeDasharray={CIRCUMFERENCE}
                                         strokeDashoffset={strokeDashoffset}
@@ -175,11 +183,15 @@ export const DigitStatistics: React.FC = () => {
                                     />
                                 </svg>
                                 <div className='digit-statistics__center'>
-                                    <span className='digit-statistics__digit'>{stat.digit}</span>
-                                    <span className='digit-statistics__percentage'>{stat.percentage.toFixed(1)}%</span>
+                                    <span className={`digit-statistics__digit${isSelectedDigit ? ' digit-statistics__digit--selected' : ''}`}>
+                                        {stat.digit}
+                                    </span>
+                                    <span className={`digit-statistics__percentage${isSelectedDigit ? ' digit-statistics__percentage--selected' : ''}`}>
+                                        {stat.percentage.toFixed(1)}%
+                                    </span>
                                 </div>
-                                {isCurrentDigit && <div className='digit-statistics__cursor' />}
                             </div>
+                            {isCurrentDigit && <div className='digit-statistics__cursor' />}
                         </div>
                     );
                 })}

@@ -11,9 +11,10 @@ import './trade-form.scss';
 interface TradeFormProps {
     currentSymbol?: string;
     onContractTypeChange?: (contractType: string) => void;
+    onDigitChange?: (digit: number) => void;
 }
 
-export const TradeForm: React.FC<TradeFormProps> = observer(({ currentSymbol, onContractTypeChange }) => {
+export const TradeForm: React.FC<TradeFormProps> = observer(({ currentSymbol, onContractTypeChange, onDigitChange }) => {
     const store = useStore();
     const client = store?.client;
     const isLoggedIn = client?.is_logged_in;
@@ -51,6 +52,12 @@ export const TradeForm: React.FC<TradeFormProps> = observer(({ currentSymbol, on
     const [barrier2, setBarrier2] = useState<number>(0);
     const [selectedDigit, setSelectedDigit] = useState<number>(5);
     const [dealCancellation, setDealCancellation] = useState<boolean>(false);
+
+    useEffect(() => {
+        if (onDigitChange) {
+            onDigitChange(selectedDigit);
+        }
+    }, [selectedDigit, onDigitChange]);
 
     const { buy, isLoading: isBuying } = useTradeExecution();
     const { proposal, requestProposal, error: proposalError } = useProposal();

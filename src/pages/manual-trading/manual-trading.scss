@@ -34,10 +34,12 @@
             height: 40%; // Chart takes 40% height on mobile
             flex: none;
 
+            /* When chart is hidden (Over/Under stats view): let content determine height */
             &:has(.manual-trading__chart-wrapper--hidden) {
                 height: auto;
-                flex: 1;
-                min-height: 350px;
+                flex: none;
+                min-height: 0;
+                overflow: visible; // Allow stats container to flow naturally
             }
         }
 
@@ -214,6 +216,48 @@
         }
     }
 
+    /* << >> toggle nav — mobile only, sits at bottom of chart/stats section */
+    &__view-nav {
+        display: none;
+
+        @media (width <= 768px) {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-top: 1px solid #eee;
+            background: #fff;
+            padding: 6px 0;
+            z-index: 4;
+        }
+    }
+
+    &__view-nav-btn {
+        flex: 1;
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: 700;
+        color: #bbb;
+        padding: 6px 0;
+        letter-spacing: 2px;
+        transition: color 0.2s;
+
+        &--active {
+            color: #333;
+        }
+
+        &:hover {
+            color: #555;
+        }
+    }
+
+    &__view-nav-divider {
+        width: 1px;
+        height: 20px;
+        background: #eee;
+    }
+
     &__panel-toggle {
         display: none;
         position: fixed;
@@ -237,30 +281,28 @@
     }
 
     &__stats-container {
+        // Desktop: absolute overlay on top of the chart
         position: absolute;
-        bottom: 40px; // Moved up from 10px
+        bottom: 40px;
         left: 0;
         right: 0;
         z-index: 5;
         pointer-events: none;
 
+        // Mobile: always in normal document flow (never overlays chart)
         @media (width <= 768px) {
-            bottom: 30px; // Also moved up on mobile
-
-            .manual-trading__chart-wrapper--hidden ~ & {
-                position: relative;
-                bottom: 0;
-                height: 100%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                background: #f8f9fa; // Background when chart is hidden
-                pointer-events: auto;
-            }
+            position: relative;
+            bottom: auto;
+            left: auto;
+            right: auto;
+            width: 100%;
+            pointer-events: auto;
+            background: #fff;
         }
 
         .digit-statistics {
-            position: relative; // Override its absolute position
+            // Desktop: override absolute positioning from digit-statistics.scss
+            position: relative;
             bottom: 0;
             background: transparent;
             backdrop-filter: none;
@@ -269,13 +311,17 @@
             border-radius: 12px;
             margin-bottom: 8px;
             box-shadow: none;
-        }
 
-        &__stats-detailed {
-            width: 100%;
-            display: flex;
-            justify-content: center;
+            // Mobile: restore white background and let it fill the container
+            @media (width <= 768px) {
+                background: #fff;
+                margin-bottom: 0;
+            }
         }
+    }
+
+    &__stats-detailed {
+        width: 100%;
     }
 
     @keyframes pulse {

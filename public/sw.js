@@ -85,6 +85,12 @@ self.addEventListener('fetch', event => {
         return;
     }
 
+    // Skip WebSocket connections (cannot be handled by service workers)
+    if (url.protocol === 'ws:' || url.protocol === 'wss:') {
+        console.log('[SW] Skipping WebSocket request:', url.href);
+        return;
+    }
+
     // Skip JavaScript chunks and CSS to prevent chunk loading errors
     if (
         url.pathname.includes('.js') ||
@@ -492,6 +498,9 @@ function isApiRequest(url) {
         // Real-time data endpoints
         url.hostname.startsWith('ws.') ||
         url.hostname.includes('websocket') ||
+        // Deriv WebSocket API
+        url.hostname.includes('ws.deriv') ||
+        url.hostname.includes('ws.binary') ||
         // Analytics and tracking (let them fail naturally rather than cache)
         url.hostname.includes('analytics') ||
         url.hostname.includes('tracking') ||

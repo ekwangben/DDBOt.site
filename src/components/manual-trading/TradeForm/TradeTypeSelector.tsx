@@ -271,6 +271,7 @@ export const CONTRACT_TYPES: ContractTypeInfo[] = [
         category: 'options',
         group: localize('Digits'),
         description: localize('Over/Under'),
+        description_link: 'https://deriv.com/trade-types/digits/',
         icon: (
             <div className='dual-icons'>
                 <svg
