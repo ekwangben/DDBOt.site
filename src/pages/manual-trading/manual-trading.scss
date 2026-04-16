@@ -293,6 +293,66 @@
 
     &__stats-detailed {
         width: 100%;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        background: #fff;
+
+        .digit-statistics {
+            padding-top: 48px; // Make room for floating market selector
+            
+            &__header {
+                display: none !important; // Hide live price indicator as requested
+            }
+
+            &__label {
+                display: none; // Hide "Digit Stats" label to save space
+            }
+        }
+    }
+
+    &__stats-header {
+        position: absolute;
+        top: 6px;
+        left: 6px;
+        z-index: 20;
+        pointer-events: auto;
+
+        .manual-trading__market-selector-wrapper {
+            margin: 0;
+            background: #ffffff;
+            border: 1px solid #eee;
+            padding: 6px 12px;
+            height: 38px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            border-radius: 8px;
+
+            .market-info {
+                .market-name-row {
+                    gap: 8px;
+
+                    .market-icon-wrapper {
+                        width: 20px;
+                        height: 20px;
+                    }
+
+                    .market-name {
+                        font-size: 13px;
+                        font-weight: 700;
+                        color: #333;
+                    }
+
+                    .chevron-icon {
+                        font-size: 16px;
+                        color: #333;
+                    }
+                }
+
+                .market-price-change {
+                    display: none !important;
+                }
+            }
+        }
     }
 
     @keyframes pulse {

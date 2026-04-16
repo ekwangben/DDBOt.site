@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { localize } from '@deriv-com/translations';
 import { api_base } from '@/external/bot-skeleton';
+import { MarketIcon } from '../../market/market-icon';
+import { LabelPairedChevronDownCaptionBoldIcon } from '@deriv/quill-icons';
 import './market-selector.scss';
 
 interface MarketSelectorProps {
@@ -76,7 +79,13 @@ export const MarketSelector: React.FC<MarketSelectorProps> = ({ onSymbolChange, 
         <div className='market-selector'>
             <div className='manual-trading__market-selector-wrapper' onClick={() => setIsOpen(true)}>
                 <div className='market-info'>
-                    <span className='market-name'>{currentSymbolData?.display_name || currentSymbol}</span>
+                    <div className='market-name-row'>
+                        <div className='market-icon-wrapper'>
+                            <MarketIcon type={currentSymbol} size='sm' />
+                        </div>
+                        <span className='market-name'>{currentSymbolData?.display_name || currentSymbol}</span>
+                        <LabelPairedChevronDownCaptionBoldIcon className='chevron-icon' />
+                    </div>
                     <span className={`market-price-change ${tick ? 'live' : ''}`}>
                         {tick ? (
                             <>
@@ -88,10 +97,9 @@ export const MarketSelector: React.FC<MarketSelectorProps> = ({ onSymbolChange, 
                         )}
                     </span>
                 </div>
-                <span className='chevron'>▼</span>
             </div>
 
-            {isOpen && (
+            {isOpen && createPortal(
                 <>
                     <div className='market-selector__overlay' onClick={() => setIsOpen(false)} />
                     <div className='market-selector__modal'>
@@ -124,7 +132,9 @@ export const MarketSelector: React.FC<MarketSelectorProps> = ({ onSymbolChange, 
                                         setIsOpen(false);
                                     }}
                                 >
-                                    <div className='icon'>📈</div>
+                                    <div className='icon'>
+                                        <MarketIcon type={s.symbol} size='sm' />
+                                    </div>
                                     <div className='info'>
                                         <span className='name'>{s.display_name}</span>
                                         <span className='submarket'>{s.submarket_display_name}</span>
@@ -134,7 +144,8 @@ export const MarketSelector: React.FC<MarketSelectorProps> = ({ onSymbolChange, 
                             ))}
                         </div>
                     </div>
-                </>
+                </>,
+                document.getElementById('modal_root') || document.body
             )}
         </div>
     );

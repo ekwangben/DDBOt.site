@@ -25,19 +25,19 @@
         display: flex;
         align-items: center;
         width: 100%;
-        padding: 0 12px;
+        padding: 0 10px;
         background: #f2f3f4;
-        border: 2px solid transparent;
+        border: 1px solid #e6e9ed;
         border-radius: 4px;
         cursor: pointer;
-        height: 64px;
+        height: 44px;
         transition: all 0.2s;
 
         &-content {
             display: flex;
             align-items: center;
             width: 100%;
-            gap: 12px;
+            gap: 8px;
 
             .back-arrow {
                 color: #333;
@@ -48,13 +48,13 @@
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                width: 38px;
-                height: 38px;
+                width: 24px;
+                height: 24px;
             }
         }
 
         &-label {
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 700;
             color: #333;
         }
@@ -64,7 +64,8 @@
         }
 
         &--active {
-            border-color: #4bb436;
+            border-color: #d6dadb;
+            background: #fff;
         }
     }
 

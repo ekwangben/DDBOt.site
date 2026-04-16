@@ -8,7 +8,7 @@ interface DigitStat {
 }
 
 const CIRCLE_SIZE = 68;
-const STROKE_WIDTH = 3;
+const STROKE_WIDTH = 6;
 const RADIUS = (CIRCLE_SIZE - STROKE_WIDTH) / 2;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
@@ -126,13 +126,10 @@ export const DigitStatistics: React.FC<DigitStatisticsProps> = ({ selectedDigit 
         setDigitStats(stats);
     }, []);
 
-    const getStrokeColor = (percentage: number) => {
-        if (percentage === 0) return '#d3d3d3';
-        const avg = 10; // 100% / 10 digits
-        if (percentage > avg) return '#4caf50';
-        if (percentage < avg) return '#f44336';
-        return '#bdbdbd';
-    };
+    const percentages = digitStats.map(s => s.percentage);
+    const maxPct = Math.max(...percentages);
+    const minPct = Math.min(...percentages);
+    const hasData = totalTicksRef.current > 0;
 
     return (
         <div className='digit-statistics'>
@@ -142,8 +139,13 @@ export const DigitStatistics: React.FC<DigitStatisticsProps> = ({ selectedDigit 
             </div>
             <div className='digit-statistics__circles'>
                 {digitStats.map(stat => {
-                    const strokeDashoffset = CIRCUMFERENCE - (stat.percentage / 100) * CIRCUMFERENCE;
-                    const strokeColor = getStrokeColor(stat.percentage);
+                    const isMax = hasData && stat.percentage === maxPct && maxPct > 0;
+                    const isMin = hasData && stat.percentage === minPct;
+                    
+                    // Only show arc for max or min
+                    const showArc = isMax || isMin;
+                    const strokeColor = isMax ? '#4caf50' : '#f44336';
+                    
                     const isCurrentDigit = stat.digit === currentDigit;
                     const isSelectedDigit = selectedDigit !== undefined && stat.digit === selectedDigit;
 
@@ -168,19 +170,25 @@ export const DigitStatistics: React.FC<DigitStatisticsProps> = ({ selectedDigit 
                                         stroke={isSelectedDigit ? 'rgba(255,255,255,0.2)' : '#f0f0f0'}
                                         strokeWidth={STROKE_WIDTH}
                                     />
-                                    <circle
-                                        className='digit-statistics__arc'
-                                        cx={CIRCLE_SIZE / 2}
-                                        cy={CIRCLE_SIZE / 2}
-                                        r={RADIUS}
-                                        fill='none'
-                                        stroke={isSelectedDigit ? 'rgba(255,255,255,0.6)' : strokeColor}
-                                        strokeWidth={STROKE_WIDTH}
-                                        strokeDasharray={CIRCUMFERENCE}
-                                        strokeDashoffset={strokeDashoffset}
-                                        strokeLinecap='round'
-                                        transform={`rotate(-90 ${CIRCLE_SIZE / 2} ${CIRCLE_SIZE / 2})`}
-                                    />
+                                    {showArc && (
+                                        <circle
+                                            cx={CIRCLE_SIZE / 2}
+                                            cy={CIRCLE_SIZE / 2}
+                                            r={RADIUS}
+                                            fill="none"
+                                            stroke={strokeColor}
+                                            strokeWidth={STROKE_WIDTH + 1}
+                                            strokeDasharray="25 100"
+                                            strokeDashoffset="0"
+                                            pathLength="100"
+                                            transform={`rotate(${90 - (25 * 3.6 / 2)} ${CIRCLE_SIZE / 2} ${CIRCLE_SIZE / 2})`}
+                                            style={{
+                                                opacity: 1,
+                                                visibility: 'visible',
+                                                transition: 'stroke 0.3s ease'
+                                            }}
+                                        />
+                                    )}
                                 </svg>
                                 <div className='digit-statistics__center'>
                                     <span className={`digit-statistics__digit${isSelectedDigit ? ' digit-statistics__digit--selected' : ''}`}>

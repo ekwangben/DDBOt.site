@@ -13,13 +13,13 @@
 
     &__input {
         width: 100%;
-        padding: 10px 12px;
+        padding: 8px 10px;
         border: 1px solid #e0e0e0;
-        border-radius: 6px;
-        font-size: 14px;
+        border-radius: 4px;
+        font-size: 13px;
         font-weight: 600;
         color: #333;
-        background: #fff;
+        background: #f8f9fa;
         transition: border-color 0.2s;
 
         &:focus {
@@ -37,7 +37,7 @@
     &__field {
         display: flex;
         flex-direction: column;
-        gap: 6px;
+        gap: 4px;
     }
 
     &__digit-selector {
@@ -92,8 +92,8 @@
     &__block {
         display: flex;
         flex-direction: column;
-        gap: 6px;
-        margin-bottom: 2px;
+        gap: 4px;
+        margin-bottom: 0;
     }
 
     &__duration-wrapper {
@@ -117,7 +117,7 @@
         .stepper-btn {
             background: transparent;
             border: none;
-            padding: 8px 12px;
+            padding: 6px 10px;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -175,10 +175,10 @@
         padding: 2px;
 
         .duration-unit-btn {
-            padding: 8px 12px;
+            padding: 6px 10px;
             border: none;
             background: transparent;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
             color: #666;
             cursor: pointer;

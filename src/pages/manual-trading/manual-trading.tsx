@@ -5,6 +5,7 @@ import { DigitStatistics } from '@/components/manual-trading/DigitStatistics';
 import { DigitStatsBar } from '@/components/manual-trading/DigitStatistics/DigitStatsBar';
 import { PositionsPanel } from '@/components/manual-trading/PositionsPanel';
 import { TradeForm } from '@/components/manual-trading/TradeForm';
+import { MarketSelector } from '@/components/manual-trading/market/MarketSelector';
 import chart_api from '@/external/bot-skeleton/services/api/chart-api';
 import { useStore } from '@/hooks/useStore';
 import {
@@ -291,6 +292,12 @@ const ManualTrading: React.FC = observer(() => {
                         {/* 1. Circular Digits + Cursor: Strictly for Over/Under (hidden when chart is shown) */}
                         {isOverUnder && !showChartOnMobile && (
                             <div className='manual-trading__stats-detailed'>
+                                <div className='manual-trading__stats-header'>
+                                    <MarketSelector
+                                        currentSymbol={chartSymbol}
+                                        onSymbolChange={handleSymbolChange}
+                                    />
+                                </div>
                                 <DigitStatistics selectedDigit={selectedBarrierDigit} />
                             </div>
                         )}
