@@ -47,7 +47,7 @@ export const MarketSelector: React.FC<MarketSelectorProps> = ({ onSymbolChange, 
                 }
 
                 const sub = api_base.api!.onMessage().subscribe(({ data }: any) => {
-                    if (data.msg_type === 'tick' && data.tick.symbol === currentSymbol) {
+                    if (data.msg_type === 'tick' && data.tick && data.tick.symbol === currentSymbol) {
                         setTick(data.tick);
                     }
                 });

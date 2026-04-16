@@ -21,8 +21,10 @@ export const DigitStatistics: React.FC<DigitStatisticsProps> = ({ selectedDigit 
         Array.from({ length: 10 }, (_, i) => ({ digit: i, percentage: 0 }))
     );
     const tickSubscriptionRef = useRef<string | null>(null);
-    const lastDigitCountsRef = useRef<number[]>([0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+    const ticksQueueRef = useRef<number[]>([]);
+    const lastDigitCountsRef = useRef<number[]>(Array(10).fill(0));
     const totalTicksRef = useRef<number>(0);
+    const MAX_TICKS = 100; // Rolling window size for accuracy
     const [currentSymbol, setCurrentSymbol] = useState<string>('R_100');
     const [currentDigit, setCurrentDigit] = useState<number | null>(null);
     const [price, setPrice] = useState<string>('0.00');
@@ -41,8 +43,9 @@ export const DigitStatistics: React.FC<DigitStatisticsProps> = ({ selectedDigit 
                 }
             }
 
-            // Reset stats
-            lastDigitCountsRef.current = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+            // Reset stats for new session/symbol
+            ticksQueueRef.current = [];
+            lastDigitCountsRef.current = Array(10).fill(0);
             totalTicksRef.current = 0;
 
             try {
@@ -112,15 +115,31 @@ export const DigitStatistics: React.FC<DigitStatisticsProps> = ({ selectedDigit 
         setPrice(priceStr);
         setCurrentDigit(lastDigit);
 
-        const newCounts = [...lastDigitCountsRef.current];
-        newCounts[lastDigit]++;
-        lastDigitCountsRef.current = newCounts;
-        totalTicksRef.current++;
+        const counts = [...lastDigitCountsRef.current];
+        const queue = [...ticksQueueRef.current];
 
-        const total = totalTicksRef.current;
+        // If we reached the max sample size, remove the oldest digit from the count
+        if (queue.length >= MAX_TICKS) {
+            const oldestDigit = queue.shift();
+            if (oldestDigit !== undefined) {
+                counts[oldestDigit] = Math.max(0, counts[oldestDigit] - 1);
+            }
+        }
+
+        // Add the new digit
+        queue.push(lastDigit);
+        counts[lastDigit]++;
+
+        // Update refs
+        ticksQueueRef.current = queue;
+        lastDigitCountsRef.current = counts;
+        totalTicksRef.current = queue.length;
+
+        // Calculate percentages based on the current window size
+        const total = queue.length;
         const stats: DigitStat[] = Array.from({ length: 10 }, (_, i) => ({
             digit: i,
-            percentage: total > 0 ? (newCounts[i] / total) * 100 : 0,
+            percentage: total > 0 ? (counts[i] / total) * 100 : 0,
         }));
 
         setDigitStats(stats);
