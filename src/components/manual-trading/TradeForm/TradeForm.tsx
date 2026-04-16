@@ -111,7 +111,7 @@ export const TradeForm: React.FC<TradeFormProps> = observer(({ currentSymbol, on
                         contractType: secondaryType,
                         amount: stake,
                         currency: selectedCurrency,
-                        duration,
+                        duration: durationUnit === 't' ? durationTicks : durationMinutes,
                         durationUnit,
                         barrier: ['HIGH', 'LOW', 'ONETOUCH', 'NOTOUCH'].includes(secondaryType) ? barrier : undefined,
                         selectedDigit: ['DIGITOVER', 'DIGITUNDER', 'DIGITMATCH', 'DIGITDIFF'].includes(secondaryType)
@@ -661,7 +661,7 @@ export const TradeForm: React.FC<TradeFormProps> = observer(({ currentSymbol, on
                             </div>
                         </>
                     )}
-                    {(proposal || tradeCategory === 'multipliers') && (
+                    {(proposal && contractType !== 'ACCU' || tradeCategory === 'multipliers') && (
                         <div className='trade-form__info-row'>
                             <div className='info-item'>
                                 <span>{localize('Potential Payout')}</span>

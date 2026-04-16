@@ -235,11 +235,7 @@ export const ContractParameters: React.FC<ContractParametersProps> = ({
             {needsDigit && (
                 <div className='contract-parameters__block'>
                     <label className='contract-parameters__label'>
-                        {contractType === 'DIGITOVER'
-                            ? localize('Over Digit')
-                            : contractType === 'DIGITUNDER'
-                              ? localize('Under Digit')
-                              : localize('Selected Digit')}
+                        {localize('Last Digit Prediction')}
                     </label>
                     <div className='contract-parameters__digit-selector'>
                         {Array.from({ length: 10 }, (_, i) => i).map(digit => (

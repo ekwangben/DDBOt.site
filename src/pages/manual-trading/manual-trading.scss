@@ -296,10 +296,12 @@
         position: relative;
         display: flex;
         flex-direction: column;
-        background: #fff;
+        background: transparent; // Completely clear
+        border-radius: 12px;
 
         .digit-statistics {
             padding-top: 48px; // Make room for floating market selector
+            background: transparent !important;
             
             &__header {
                 display: none !important; // Hide live price indicator as requested
@@ -312,11 +314,18 @@
     }
 
     &__stats-header {
-        position: absolute;
-        top: 6px;
-        left: 6px;
-        z-index: 20;
-        pointer-events: auto;
+        display: none; // Hide on desktop to avoid redundancy with the primary chart selector
+
+        @media (width <= 768px) {
+            position: absolute;
+            top: 6px;
+            left: 6px;
+            right: 6px;
+            z-index: 20;
+            pointer-events: auto;
+            display: flex;
+            justify-content: flex-start;
+        }
 
         .manual-trading__market-selector-wrapper {
             margin: 0;
@@ -324,27 +333,40 @@
             border: 1px solid #eee;
             padding: 6px 12px;
             height: 38px;
+            width: 160px; // Fixed width to allow chevron to move to the far end
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
             border-radius: 8px;
 
             .market-info {
+                width: 100%;
+
                 .market-name-row {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    width: 100%;
                     gap: 8px;
 
                     .market-icon-wrapper {
                         width: 20px;
                         height: 20px;
+                        flex-shrink: 0;
                     }
 
                     .market-name {
                         font-size: 13px;
                         font-weight: 700;
                         color: #333;
+                        flex: 1;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
                     }
 
                     .chevron-icon {
                         font-size: 16px;
                         color: #333;
+                        flex-shrink: 0;
                     }
                 }
 
