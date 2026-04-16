@@ -13,7 +13,7 @@
         padding: 16px;
         flex: 1;
         min-height: 0;
-        overflow-y: auto;
+        overflow-y: hidden;
 
         @media (width <=480px) {
             padding: 12px;
@@ -734,59 +734,41 @@
         }
 
         &.up {
-            background: linear-gradient(135deg, #0ce93b, #09a828);
-            box-shadow:
-                0 0 15px rgb(12 233 59 / 50%),
-                0 4px 20px rgb(12 233 59 / 30%);
+            background: #0ce93b;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            text-shadow: 0 1px 2px rgb(0 0 0 / 30%);
 
             &:hover {
-                background: linear-gradient(135deg, #1aff4c, #0bc431);
-                box-shadow:
-                    0 0 20px rgb(12 233 59 / 70%),
-                    0 6px 25px rgb(12 233 59 / 40%);
+                background: #0ce93b;
             }
 
             &:active {
-                box-shadow: 0 2px 8px rgb(12 233 59 / 40%);
-                transform: translateY(2px);
+                background: #09c82d;
+                transform: scale(0.98);
             }
         }
 
         &.down {
-            background: linear-gradient(135deg, #ff1a40, #cc001d);
-            box-shadow:
-                0 0 15px rgb(255 26 64 / 50%),
-                0 4px 20px rgb(255 26 64 / 30%);
+            background: #ff1a40;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            text-shadow: 0 1px 2px rgb(0 0 0 / 30%);
 
             &:hover {
-                background: linear-gradient(135deg, #f35, #e60022);
-                box-shadow:
-                    0 0 20px rgb(255 26 64 / 70%),
-                    0 6px 25px rgb(255 26 64 / 40%);
+                background: #ff1a40;
             }
 
             &:active {
-                box-shadow: 0 2px 8px rgb(255 26 64 / 40%);
-                transform: translateY(2px);
+                background: #e60022;
+                transform: scale(0.98);
             }
         }
 
         &.single {
-            background: linear-gradient(135deg, #0ce93b, #09a828);
+            background: #0ce93b;
             height: 56px;
-            box-shadow:
-                0 0 15px rgb(12 233 59 / 50%),
-                0 4px 20px rgb(12 233 59 / 30%);
             font-size: 16px;
             letter-spacing: 0.5px;
             text-transform: uppercase;
-            text-shadow: 0 1px 2px rgb(0 0 0 / 30%);
 
             @media (width <=768px) {
                 height: 52px;
@@ -798,15 +780,12 @@
             }
 
             &:hover {
-                background: linear-gradient(135deg, #1aff4c, #0bc431);
-                box-shadow:
-                    0 0 20px rgb(12 233 59 / 70%),
-                    0 6px 25px rgb(12 233 59 / 40%);
+                background: #0ce93b;
             }
 
             &:active {
-                box-shadow: 0 2px 8px rgb(12 233 59 / 40%);
-                transform: translateY(2px);
+                background: #09c82d;
+                transform: scale(0.98);
             }
 
             .btn-content {
