@@ -30,13 +30,20 @@
         margin-bottom: 8px; // Even tighter spacing
     }
 
+    &__label-with-toggle {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 4px;
+    }
+
     &__label {
         display: flex;
         align-items: center;
         gap: 6px;
         font-size: 13px;
         color: #666;
-        margin-bottom: 4px;
+        margin-bottom: 0; // Reset margin since parent handles it
         font-weight: 500;
 
         @media (width <=768px) {
@@ -47,7 +54,6 @@
         @media (width <=480px) {
             font-size: 12px;
             gap: 6px;
-            margin-bottom: 6px;
         }
 
         .info-icon {
@@ -60,6 +66,37 @@
             border-radius: 50%;
             font-size: 10px;
             opacity: 0.6;
+        }
+    }
+
+    .basis-toggle {
+        display: flex;
+        background: #e9eaeb;
+        padding: 2px;
+        border-radius: 4px;
+        gap: 2px;
+
+        &__btn {
+            border: none;
+            background: transparent;
+            padding: 2px 8px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #666;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+
+            &.active {
+                background: #fff;
+                color: #333;
+                box-shadow: 0 1px 4px rgb(0 0 0 / 10%);
+            }
+
+            &:hover:not(.active) {
+                background: rgb(255 255 255 / 40%);
+            }
         }
     }
 
@@ -739,37 +776,39 @@
         }
 
         &.up {
-            background: #0ce93b;
+            background: #00c03d; // Stronger, more intense green
             text-transform: uppercase;
             letter-spacing: 0.5px;
 
             &:hover {
-                background: #0ce93b;
+                background: #00d444;
+                filter: brightness(1.1);
             }
 
             &:active {
-                background: #09c82d;
+                background: #00a835;
                 transform: scale(0.98);
             }
         }
 
         &.down {
-            background: #ff1a40;
+            background: #ff444f; // More intense, 'shouting' red
             text-transform: uppercase;
             letter-spacing: 0.5px;
 
             &:hover {
-                background: #ff1a40;
+                background: #ff5c65;
+                filter: brightness(1.1);
             }
 
             &:active {
-                background: #e60022;
+                background: #e63d46;
                 transform: scale(0.98);
             }
         }
 
         &.single {
-            background: #0ce93b;
+            background: #00c03d;
             height: 48px;
             font-size: 15px;
             letter-spacing: 0.5px;
@@ -785,11 +824,12 @@
             }
 
             &:hover {
-                background: #0ce93b;
+                background: #00d444;
+                filter: brightness(1.1);
             }
 
             &:active {
-                background: #09c82d;
+                background: #00a835;
                 transform: scale(0.98);
             }
 

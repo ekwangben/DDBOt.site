@@ -51,6 +51,7 @@ export const TradeForm: React.FC<TradeFormProps> = observer(({ currentSymbol, on
     const [barrier, setBarrier] = useState<number>(0);
     const [barrier2, setBarrier2] = useState<number>(0);
     const [selectedDigit, setSelectedDigit] = useState<number>(5);
+    const [basis, setBasis] = useState<'stake' | 'payout'>('stake');
     const [dealCancellation, setDealCancellation] = useState<boolean>(false);
 
     useEffect(() => {
@@ -80,6 +81,15 @@ export const TradeForm: React.FC<TradeFormProps> = observer(({ currentSymbol, on
         'NOTOUCH',
     ].includes(contractType);
 
+    const isDigitTrade = [
+        'DIGITOVER',
+        'DIGITUNDER',
+        'DIGITMATCH',
+        'DIGITDIFF',
+        'DIGITEVEN',
+        'DIGITODD',
+    ].includes(contractType);
+
     // Request proposal when parameters change
     useEffect(() => {
         if (!symbol || !stake) return;
@@ -92,6 +102,7 @@ export const TradeForm: React.FC<TradeFormProps> = observer(({ currentSymbol, on
                     contractType,
                     amount: stake,
                     currency: selectedCurrency,
+                    basis,
                     ...(contractType === 'ACCU' && { growth_rate: growthRate }),
                     ...(tradeCategory === 'options' && {
                         duration: durationUnit === 't' ? durationTicks : durationMinutes,
@@ -111,6 +122,7 @@ export const TradeForm: React.FC<TradeFormProps> = observer(({ currentSymbol, on
                         contractType: secondaryType,
                         amount: stake,
                         currency: selectedCurrency,
+                        basis,
                         duration: durationUnit === 't' ? durationTicks : durationMinutes,
                         durationUnit,
                         barrier: ['HIGH', 'LOW', 'ONETOUCH', 'NOTOUCH'].includes(secondaryType) ? barrier : undefined,
@@ -139,6 +151,7 @@ export const TradeForm: React.FC<TradeFormProps> = observer(({ currentSymbol, on
         barrier,
         barrier2,
         selectedDigit,
+        basis,
         needsDualButtons,
         dealCancellation,
     ]);
@@ -176,6 +189,7 @@ export const TradeForm: React.FC<TradeFormProps> = observer(({ currentSymbol, on
                     contractType: typeToBuy,
                     amount: stake,
                     currency: selectedCurrency,
+                    basis,
                     ...(typeToBuy === 'ACCU' && { growth_rate: growthRate }),
                     ...(tradeCategory === 'options' && {
                         duration: durationUnit === 't' ? durationTicks : durationMinutes,
@@ -325,14 +339,34 @@ export const TradeForm: React.FC<TradeFormProps> = observer(({ currentSymbol, on
                             onDurationTicksChange={setDurationTicks}
                             onDurationMinutesChange={setDurationMinutes}
                             onDurationUnitChange={setDurationUnit}
-                            hideMinutes={contractType === 'DIGITOVER' || contractType === 'DIGITUNDER'}
+                            hideMinutes={isDigitTrade}
                         />
                     </div>
                 )}
 
                 <div className='trade-form__main-inputs'>
                     <div className='trade-form__section'>
-                        <label className='trade-form__label'>{localize('Stake')}</label>
+                        <div className='trade-form__label-with-toggle'>
+                            <label className='trade-form__label'>
+                                {basis === 'stake' ? localize('Stake') : localize('Payout')}
+                            </label>
+                            {tradeCategory === 'options' && (
+                                <div className='basis-toggle'>
+                                    <button
+                                        className={`basis-toggle__btn ${basis === 'stake' ? 'active' : ''}`}
+                                        onClick={() => setBasis('stake')}
+                                    >
+                                        {localize('Stake')}
+                                    </button>
+                                    <button
+                                        className={`basis-toggle__btn ${basis === 'payout' ? 'active' : ''}`}
+                                        onClick={() => setBasis('payout')}
+                                    >
+                                        {localize('Payout')}
+                                    </button>
+                                </div>
+                            )}
+                        </div>
                         <div className='trade-form__stake-input'>
                             <button className='stake-btn' onClick={() => setStake(Math.max(1, stake - 1))}>
                                 <svg
@@ -451,10 +485,7 @@ export const TradeForm: React.FC<TradeFormProps> = observer(({ currentSymbol, on
                         </div>
                     </div>
                 )}
-                {contractType !== 'ONETOUCH' &&
-                    contractType !== 'NOTOUCH' &&
-                    contractType !== 'DIGITOVER' &&
-                    contractType !== 'DIGITUNDER' && (
+                {(tradeCategory === 'multipliers' || tradeCategory === 'accumulators') && (
                         <div className='trade-form__risk'>
                             <div className='risk-item'>
                                 <div className='risk-item__left'>
@@ -695,13 +726,13 @@ export const TradeForm: React.FC<TradeFormProps> = observer(({ currentSymbol, on
                                         <path d='M12 4l-8 12h16l-8-12z' />
                                     </svg>
                                     <span className='label'>
-                                        {contractType.includes('MATCH')
+                                        {contractType.includes('MATCH') || contractType.includes('DIFF')
                                             ? localize('Matches')
-                                            : contractType.includes('EVEN')
+                                            : contractType.includes('EVEN') || contractType.includes('ODD')
                                               ? localize('Even')
-                                              : contractType.includes('OVER')
+                                              : contractType.includes('OVER') || contractType.includes('UNDER')
                                                 ? localize('Over')
-                                                : contractType.includes('HIGHER')
+                                                : contractType.includes('HIGHER') || contractType.includes('LOWER')
                                                   ? localize('Higher')
                                                   : contractType.includes('TOUCH')
                                                     ? localize('Touch')
@@ -714,7 +745,10 @@ export const TradeForm: React.FC<TradeFormProps> = observer(({ currentSymbol, on
                                                           : localize('Up')}
                                     </span>
                                     <span className='payout'>
-                                        {proposal?.payout.toFixed(2) || '10.00'} {selectedCurrency}
+                                        {basis === 'stake'
+                                            ? (proposal?.payout.toFixed(2) || '0.00')
+                                            : (proposal?.askPrice.toFixed(2) || '0.00')}{' '}
+                                        {selectedCurrency}
                                     </span>
                                 </div>
                             </button>
@@ -737,13 +771,13 @@ export const TradeForm: React.FC<TradeFormProps> = observer(({ currentSymbol, on
                                         <path d='M12 20l8-12h-16l8 12z' />
                                     </svg>
                                     <span className='label'>
-                                        {contractType.includes('DIFF')
+                                        {contractType.includes('MATCH') || contractType.includes('DIFF')
                                             ? localize('Differs')
-                                            : contractType.includes('ODD')
+                                            : contractType.includes('EVEN') || contractType.includes('ODD')
                                               ? localize('Odd')
-                                              : contractType.includes('UNDER')
+                                              : contractType.includes('OVER') || contractType.includes('UNDER')
                                                 ? localize('Under')
-                                                : contractType.includes('LOWER')
+                                                : contractType.includes('HIGHER') || contractType.includes('LOWER')
                                                   ? localize('Lower')
                                                   : contractType.includes('TOUCH')
                                                     ? localize('No Touch')
@@ -756,7 +790,10 @@ export const TradeForm: React.FC<TradeFormProps> = observer(({ currentSymbol, on
                                                           : localize('Down')}
                                     </span>
                                     <span className='payout'>
-                                        {secondaryProposal?.payout.toFixed(2) || '10.00'} {selectedCurrency}
+                                        {basis === 'stake'
+                                            ? (secondaryProposal?.payout.toFixed(2) || '0.00')
+                                            : (secondaryProposal?.askPrice.toFixed(2) || '0.00')}{' '}
+                                        {selectedCurrency}
                                     </span>
                                 </div>
                             </button>

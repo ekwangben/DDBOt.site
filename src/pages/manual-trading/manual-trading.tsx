@@ -231,8 +231,8 @@ const ManualTrading: React.FC = observer(() => {
 
     const is_connection_opened = !!chart_api?.api;
 
-    const isOverUnder = ['DIGITOVER', 'DIGITUNDER'].includes(currentContractType);
-    const shouldHideChart = isMobile && isOverUnder && !showChartOnMobile;
+    const isDigitContract = ['DIGITOVER', 'DIGITUNDER', 'DIGITMATCH', 'DIGITDIFF', 'DIGITEVEN', 'DIGITODD'].includes(currentContractType);
+    const shouldHideChart = isMobile && isDigitContract && !showChartOnMobile;
 
     const handleSymbolChange = (newSymbol: string) => {
         setChartSymbol(newSymbol);
@@ -290,7 +290,7 @@ const ManualTrading: React.FC = observer(() => {
                     {/* Digit Statistics Overlay */}
                     <div className='manual-trading__stats-container'>
                         {/* 1. Circular Digits + Cursor: Strictly for Over/Under (hidden when chart is shown) */}
-                        {isOverUnder && !showChartOnMobile && (
+                        {isDigitContract && !showChartOnMobile && (
                             <div className='manual-trading__stats-detailed'>
                                 <div className='manual-trading__stats-header'>
                                     <MarketSelector
@@ -314,7 +314,7 @@ const ManualTrading: React.FC = observer(() => {
                     </div>
 
                     {/* << >> Chart / Stats toggle — mobile only, Over/Under only */}
-                    {isMobile && isOverUnder && (
+                    {isMobile && isDigitContract && (
                         <div className='manual-trading__view-nav'>
                             <button
                                 className={`manual-trading__view-nav-btn${showChartOnMobile ? ' manual-trading__view-nav-btn--active' : ''}`}

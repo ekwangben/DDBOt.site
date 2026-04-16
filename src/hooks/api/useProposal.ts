@@ -16,6 +16,7 @@ export interface ProposalParams {
     barrier2?: number | string;
     selectedDigit?: number;
     multiplier?: number;
+    basis?: 'stake' | 'payout';
     limitOrder?: {
         take_profit?: number;
         stop_loss?: number;
@@ -79,7 +80,7 @@ export const useProposal = () => {
                 contract_type: params.contractType,
                 currency: params.currency,
                 symbol: params.symbol,
-                basis: 'stake', // Deriv API always needs to know if amount refers to stake or payout, even for ACCU
+                basis: params.basis || 'stake',
                 ...(params.duration && { duration: params.duration }),
                 ...(params.durationUnit && { duration_unit: params.durationUnit }),
                 ...(params.barrier && { barrier: params.barrier.toString() }),

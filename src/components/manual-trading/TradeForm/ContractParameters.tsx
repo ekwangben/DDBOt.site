@@ -39,7 +39,6 @@ export const ContractParameters: React.FC<ContractParametersProps> = ({
     const needsBarrier = ['HIGH', 'LOW', 'ONETOUCH', 'NOTOUCH'].includes(contractType);
     const needsDoubleBarrier = ['EXPIRYRANGE', 'EXPIRYMISS'].includes(contractType);
     const needsDigit = ['DIGITOVER', 'DIGITUNDER', 'DIGITMATCH', 'DIGITDIFF'].includes(contractType);
-    const needsEvenOdd = ['DIGITEVEN', 'DIGITODD'].includes(contractType);
 
     // Most options need duration, but allow hiding minutes for specific types
     const needsMinutes = !hideMinutes;
@@ -252,16 +251,6 @@ export const ContractParameters: React.FC<ContractParametersProps> = ({
                 </div>
             )}
 
-            {needsEvenOdd && (
-                <div className='contract-parameters__block'>
-                    <label className='contract-parameters__label'>{localize('Prediction')}</label>
-                    <div className='contract-parameters__even-odd'>
-                        <div className='contract-parameters__prediction'>
-                            {contractType === 'DIGITEVEN' ? localize('Even') : localize('Odd')}
-                        </div>
-                    </div>
-                </div>
-            )}
         </div>
     );
 };
