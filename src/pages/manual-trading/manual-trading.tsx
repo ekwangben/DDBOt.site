@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { localize } from '@deriv-com/translations';
 import { observer } from 'mobx-react-lite';
 import { AccountSelector } from '@/components/manual-trading/AccountSelector/AccountSelector';
 import { DigitStatistics } from '@/components/manual-trading/DigitStatistics';
@@ -340,6 +341,21 @@ const ManualTrading: React.FC = observer(() => {
                     className={`manual-trading__trade-panel ${!isPanelOpen ? 'manual-trading__trade-panel--closed' : ''}`}
                 >
                     <AccountSelector />
+                    
+                    <div className='manual-trading__trade-panel-tabs'>
+                        <button 
+                            className={`tab-btn ${!showPositions ? 'active' : ''}`}
+                            onClick={() => setShowPositions(false)}
+                        >
+                            {localize('Trade')}
+                        </button>
+                        <button 
+                            className={`tab-btn ${showPositions ? 'active' : ''}`}
+                            onClick={() => setShowPositions(true)}
+                        >
+                            {localize('Positions')}
+                        </button>
+                    </div>
 
                     {!showPositions ? (
                         <TradeForm
