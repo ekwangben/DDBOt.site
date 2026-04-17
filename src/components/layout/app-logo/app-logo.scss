@@ -23,12 +23,30 @@
         }
     }
 
-    &__logo-text {
-        font-size: 1.6rem;
-        font-weight: 700;
-        color: #333;
-        text-transform: lowercase;
+    &__logo-icon {
+        width: 32px;
+        height: 32px;
+    }
+
+    &__logo-brand {
+        display: flex;
+        flex-direction: column;
+        line-height: 1;
+        gap: 2px;
+    }
+
+    &__logo-text-smart {
+        font-size: 1.8rem;
+        font-weight: 900;
+        color: #00c03d; // Brand Green
         letter-spacing: 0.5px;
+    }
+
+    &__logo-text-trades {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #ff444f; // Brand Red
+        letter-spacing: 2px;
     }
 
     &__logo-chevron {

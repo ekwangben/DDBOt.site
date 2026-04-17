@@ -4,6 +4,7 @@ import {
     LabelPairedChevronDownCaptionRegularIcon,
     LabelPairedPuzzlePieceTwoCaptionBoldIcon,
 } from '@deriv/quill-icons/LabelPaired';
+import { SmartTradesLogo } from './Logo';
 import { useDevice } from '@deriv-com/ui';
 import './app-logo.scss';
 
@@ -31,7 +32,11 @@ export const AppLogo = () => {
     return (
         <div className='app-header__logo-wrapper'>
             <div className='app-header__logo-dropdown' onClick={() => setIsDropdownOpen(!isDropdownOpen)}>
-                <span className='app-header__logo-text'>smart trades pro</span>
+                <SmartTradesLogo className='app-header__logo-icon' />
+                <div className='app-header__logo-brand'>
+                    <span className='app-header__logo-text-smart'>SMART</span>
+                    <span className='app-header__logo-text-trades'>TRADES PRO</span>
+                </div>
                 <LabelPairedChevronDownCaptionRegularIcon
                     className={`app-header__logo-chevron ${isDropdownOpen ? 'rotated' : ''}`}
                     height='16px'
